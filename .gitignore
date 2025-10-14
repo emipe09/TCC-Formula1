@@ -1,0 +1,13 @@
+# Ignorar cache do FastF1
+Scripts/fastf1_cache/
+
+# Ignorar arquivos grandes e temporários
+*.sqlite
+*.ff1pkl
+
+# Ignorar arquivos do Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignorar arquivos de sistema
+Thumbs.db
+.DS_Store
