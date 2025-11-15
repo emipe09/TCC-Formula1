@@ -285,11 +285,13 @@
                     "MEDIUM": "C3",
                     "HARD": "C2"
                 },
-                "Brazilian Grand Prix": {
-                    "SOFT": "C4",
-                    "MEDIUM": "C3",
-                    "HARD": "C2"
-                },
+            "São Paulo Grand Prix": {
+                "SOFT": "C4",
+                "MEDIUM": "C3",
+                "HARD": "C2",
+                "INTERMEDIATE": "I",
+                "WET": "W"
+            },
                 "Qatar Grand Prix": {
                     "SOFT": "C3",
                     "MEDIUM": "C2",
@@ -407,10 +409,12 @@
                 "MEDIUM": "C3",
                 "HARD": "C2"
             },
-            "Brazilian Grand Prix": {
+            "São Paulo Grand Prix": {
                 "SOFT": "C4",
                 "MEDIUM": "C3",
-                "HARD": "C2"
+                "HARD": "C2",
+                "INTERMEDIATE": "I",
+                "WET": "W"
             },
             "Abu Dhabi Grand Prix": {
                 "SOFT": "C5",
@@ -514,10 +518,12 @@
                 "MEDIUM": "C3",
                 "HARD": "C2"
             },
-            "Brazilian Grand Prix": {
+            "São Paulo Grand Prix": {
                 "SOFT": "C4",
                 "MEDIUM": "C3",
-                "HARD": "C2"
+                "HARD": "C2",
+                "INTERMEDIATE": "I",
+                "WET": "W"
             },
             "Abu Dhabi Grand Prix": {
                 "SOFT": "C5",
@@ -626,10 +632,12 @@
                 "MEDIUM": "C4",
                 "HARD": "C3"
             },
-            "Brazilian Grand Prix": {
+            "São Paulo Grand Prix": {
                 "SOFT": "C5",
                 "MEDIUM": "C4",
-                "HARD": "C3"
+                "HARD": "C3",
+                "INTERMEDIATE": "I",
+                "WET": "W"
             },
             "United States Grand Prix": {
                 "SOFT": "C4",
@@ -701,9 +709,7 @@
             "British Grand Prix": {
                 "SOFT": "C4",
                 "MEDIUM": "C3",
-                "HARD": "C2",
-                "INTERMEDIATE": "I",
-                "WET": "W"
+                "HARD": "C2"
             },
             "Austrian Grand Prix": {
                 "SOFT": "C5",
@@ -724,6 +730,23 @@
                 "SOFT": "C4",
                 "MEDIUM": "C3",
                 "HARD": "C2"
+            },
+            "São Paulo Grand Prix": {
+                "SOFT": "C4",
+                "MEDIUM": "C3",
+                "HARD": "C2",
+                "INTERMEDIATE": "I",
+                "WET": "W"
+            },
+            "Belgian Grand Prix": {
+                "SOFT": "C4",
+                "MEDIUM": "C3",
+                "HARD": "C1"
+            },
+            "Italian Grand Prix": {
+                "SOFT": "C5",
+                "MEDIUM": "C4",
+                "HARD": "C3"
             }
         }
     }
