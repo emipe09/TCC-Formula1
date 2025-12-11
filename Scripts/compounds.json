@@ -747,6 +747,16 @@
                 "SOFT": "C5",
                 "MEDIUM": "C4",
                 "HARD": "C3"
+            },
+            "Mexican Grand Prix": {
+                "SOFT": "C5",
+                "MEDIUM": "C4",
+                "HARD": "C2"
+            },
+            "United States Grand Prix": {
+                "SOFT": "C4",
+                "MEDIUM": "C3",
+                "HARD": "C1"
             }
         }
     }
