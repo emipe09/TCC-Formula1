@@ -24,6 +24,7 @@ O pipeline completo de coleta, tratamento, engenharia de features, modelagem e a
 | **🇮🇹 GP da Itália (Monza)**           | ✅ **Concluído** |
 | **🇦🇹 GP da Áustria (Red Bull Ring)**  | ✅ **Concluído** |
 
+---
 
 ## 📋 Sobre o Projeto
 
