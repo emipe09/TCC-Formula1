@@ -14,14 +14,16 @@ O projeto propõe uma abordagem generalista de Ciência de Dados para prever tem
 
 ## 🚧 Status do Projeto
 
-Atualmente, o pipeline de análise e modelagem foi **completamente implementado e validado para o Grande Prêmio do Bahrein (Sakhir)**. A expansão para os demais 4 circuitos está em andamento.
+O pipeline completo de coleta, tratamento, engenharia de features, modelagem e avaliação foi implementado para os cinco circuitos definidos no escopo do trabalho.
 
-| Circuito  Status |
-| :--- | :--- |
-| **🇧🇭 GP do Bahrein (Sakhir)** |✅ **Concluído** |
-| **Circuitos 2-5** |🔄 *Em Breve* |
+| Circuito                                | Status          |
+| :-------------------------------------- | :-------------- |
+| **🇧🇭 GP do Bahrein (Sakhir)**         | ✅ **Concluído** |
+| **🇸🇦 GP da Arábia Saudita (Jeddah)**  | ✅ **Concluído** |
+| **🇺🇸 GP dos Estados Unidos (Austin)** | ✅ **Concluído** |
+| **🇮🇹 GP da Itália (Monza)**           | ✅ **Concluído** |
+| **🇦🇹 GP da Áustria (Red Bull Ring)**  | ✅ **Concluído** |
 
----
 
 ## 📋 Sobre o Projeto
 
@@ -31,7 +33,7 @@ A estratégia na Fórmula 1 é um problema de otimização sob incerteza. Este p
 * **Metodologia Escalável:** O código foi estruturado para ser replicado em qualquer pista com ajustes mínimos.
 * **Coleta de Dados:** Extração automatizada via API [FastF1](https://github.com/theOehrly/Fast-F1).
 * **Engenharia de Features:** Transformação RBF (Radial Basis Function) para dados climáticos (multimodais), PCA, Clusterização K-Means, remoção de outliers.
-* **Seleção de Modelos:** Algoritmo de *Backward Elimination* otimizado via critério de informação **Mallows' $C_p$**.
+* **Seleção de Modelos:** Algoritmo de *Backward Elimination* para verificar conjunto de variavéis ideal.
 
 ---
 
@@ -59,6 +61,4 @@ Ainda explorando.
 
 ---
 
-## 📄 Licença
 
-Este projeto está sob a licença MIT - veja o arquivo [LICENSE](LICENSE) para detalhes.
