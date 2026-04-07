@@ -2,7 +2,7 @@
 
 ## 📋 Título da Pesquisa
 
-**Análise Preditiva e Otimização de Estratégias na Fórmula 1 Utilizando Aprendizado de Máquina**
+**Análise Multicircuito de Tempos de Volta na Fórmula 1: Comparação de Modelos Preditivos e Extração de Insights Estratégicos**
 
 ---
 
