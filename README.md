@@ -533,10 +533,10 @@ Se encontrar bugs ou quiser melhorar o projeto:
 
 ## 📝 Autor
 
-**[Seu Nome/Grupo]**  
+**Marcos Paulo de Oliveira Pereira**
+**Alexandre Magno de Sousa** 
 Trabalho de Conclusão de Curso - UFOP  
-Engenharia de Computação / [Curso Relevante]  
-2024-2025
+Engenharia de Computação
 
 ---
 
@@ -548,14 +548,11 @@ Este projeto é fornecido como material acadêmico. Todos os dados públicos de 
 
 ## ✨ Próximos Passos / Melhorias Futuras
 
-- [ ] Integrar dados em tempo real de futuros Grand Prix
-- [ ] Expandir para análise de pit stops
-- [ ] Implementar previsões para qualificação (qualifying)
+- [ ] Validar a abordgem ideal para construção do modelo, através de comparações e justificativas na literatura
+- [ ] Integrar dados de treino e classificação como uma informação importante para o modelo
+- [ ] Integrar o modelo ideal à uma simulação para cada corrida
+- [ ] Execução de cenários e análise de estratégias
 - [ ] Criar API web para fazer previsões em tempo real
-- [ ] Analisar impacto de Safety Cars e bandeiras vermelhas
-- [ ] Modelar degradação de motor (consumo de combustível)
-- [ ] Dashboard interativo com Plotly/Dash
-- [ ] Comparar estratégias ótimas usando programação dinâmica
 
 ---
 
