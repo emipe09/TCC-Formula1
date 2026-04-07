@@ -1,0 +1,12 @@
+fastf1
+pandas
+numpy
+matplotlib
+seaborn
+scikit-learn
+plotly
+scipy
+statsmodels
+xgboost
+optuna
+shap
