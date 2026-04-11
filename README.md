@@ -94,10 +94,75 @@ Isso permite que o modelo generalize: *"pneus C3 degradam de forma X"* independe
 
 ## 🏗️ Estrutura do Projeto
 
-### Diretórios Principais
+A estrutura de diretórios foi cuidadosamente reorganizada para separar a obtenção de dados via API, transformações em notebooks (EDA) e a execução produtiva dos modelos:
 
 ```
-TCC-Formula1/
+TCC/
+├── Bibliografia/               # Artigos e referências do TCC
+├── Data/                       # Dados brutos obtidos do FastF1
+│   ├── Bahrain/                # Organizado por país -> Sessão -> Variável
+│   │   ├── Race/               
+│   │   │   ├── Laps/           # bahrain_grand_prix_laps_2022.csv ...
+│   │   │   └── Weather/        # bahrain_grand_prix_weather_2022.csv ...
+│   │   ├── Free Practice/
+│   │   └── Results/            
+│   ├── Hungary/                
+│   ├── Italy/
+│   ├── Saudi Arabia/
+│   └── United States/
+├── Scripts/                    # Todo o código fonte e desenvolvimento
+│   ├── Notebooks/              # Exploração de dados e visualização (EDA)
+│   │   ├── Notebook_Bahrain.ipynb
+│   │   └── Notebook_USA.ipynb ...
+│   ├── Source/                 # Scripts Python modulares para pipeline final
+│   │   ├── script_model_data.py       # Extração de outliers, transformações RBF e merge do CSV Limpo
+│   │   ├── model_lr_baseline.py       # Regressão Linear Simples
+│   │   ├── model_lr_crossvalidation.py# Regressão Linear com K-Fold robusto
+│   │   ├── model_lr_wf.py             # Regressão Linear Walk-Forward (por voltas)
+│   │   ├── model_xgb_cv.py            # XGBoost com K-Fold e Tuning via Optuna
+│   │   └── model_xgb_wf.py            # XGBoost via Walk-Forward usando hiperparâmetros tunados
+│   ├── ModelData/              # [NOVO] CSVs totalmente limpos gerados pelo script_model_data.py
+│   │   └── Bahrain Grand Prix/
+│   │       └── bahrain_grand_prix_cleaned_data.csv
+│   ├── Utils/                  # [NOVO] Artefatos salvos pelos modelos (ex: hyperparams em JSON)
+│   │   └── bahrain_grand_prix_xgb_params.json
+│   └── compounds.json          # Mapeamento oficial dos compostos C1-C5
+├── .gitignore                  
+├── README.md                   
+└── requirements.txt            
+```
+
+---
+
+## 🚀 Como Executar o Pipeline
+
+O novo fluxo de trabalho é totalmente modular. Siga esta ordem:
+
+1. **Pré-Processamento dos Dados:**
+   Abra e edite a variável `target_gp_name` (ex: `'Bahrain Grand Prix'`) no arquivo de tratamento, em seguida execute a limpeza. Ele criará o `.csv` definitivo na pasta `ModelData/`.
+   ```bash
+   python Scripts/Source/script_model_data.py
+   ```
+
+2. **Modelos Baseline e Walk-Forward (Linear Regression):**
+   Com os dados limpos disponíveis, teste a regressão linear:
+   ```bash
+   python Scripts/Source/model_lr_baseline.py
+   python Scripts/Source/model_lr_crossvalidation.py
+   python Scripts/Source/model_lr_wf.py
+   ```
+
+3. **Otimização Avançada (XGBoost + Optuna):**
+   Execute o treinamento XGBoost. Ele fará o _tuning_ do Optuna e **salvará** automaticamente os melhores parâmetros num `.json` dentro da pasta `Scripts/Utils/`, além de rodar os splits da validação cruzada.
+   ```bash
+   python Scripts/Source/model_xgb_cv.py
+   ```
+
+4. **Validação Walk-Forward (XGBoost):**
+   Por fim, teste a robustez cronológica do XGBoost. Ele lerá os hiperparâmetros salvos previamente no JSON para treinar árvores crescentes (Walk Forward Validation).
+   ```bash
+   python Scripts/Source/model_xgb_wf.py
+   ```
 ├── README.md                                    # Este arquivo
 ├── requirements.txt                             # Dependências Python
 ├── scripts/                                     # Coleta de dados
