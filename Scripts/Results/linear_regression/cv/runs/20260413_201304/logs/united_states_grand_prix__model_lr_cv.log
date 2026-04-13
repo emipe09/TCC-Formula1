@@ -1,0 +1,32 @@
+Carregando dados limpos de:
+c:\Users\mpoli\Desktop\UFOP\9 PERIODO\TCC\Scripts\ModelData\United States Grand Prix\united_states_grand_prix_cleaned_data.csv
+--- PREPARACAO PARA REGRESSAO LINEAR (DRIVER ONE-HOT) ---
+
+--- SPLIT SEQUENCIAL DEFINIDO ---
+Pista: United States Grand Prix
+Total de voltas consideradas: 54 (LapNumber 3-56)
+Holdout (20% final): voltas 46-56 | Total de voltas: 11 | Registros: 669
+Modelagem (80% iniciais): voltas 3-45 | Total de voltas: 43 | Registros: 2394
+
+--- AVALIACAO INTERNA POR K-FOLD (DENTRO DOS 80%) ---
+Fold 1 | treino=1915 | val=479 | RMSE=0.3471 | R2=0.9587
+Fold 2 | treino=1915 | val=479 | RMSE=0.3302 | R2=0.9588
+Fold 3 | treino=1915 | val=479 | RMSE=0.3399 | R2=0.9620
+Fold 4 | treino=1915 | val=479 | RMSE=0.3687 | R2=0.9525
+Fold 5 | treino=1916 | val=478 | RMSE=0.3288 | R2=0.9570
+
+--- TREINANDO MODELO FINAL (BASE DE MODELAGEM 80%) ---
+
+--- RESULTADO FINAL REGRESSAO LINEAR ---
+RMSE Medio: 0.3429 IC95%: [0.3228, 0.3631]
+MAE Medio: 0.2694 IC95%: [0.2562, 0.2826]
+R2 Medio: 0.9578 IC95%: [0.9535, 0.9621]
+
+--- TESTE FINAL NO HOLDOUT SEQUENCIAL (20%) ---
+Teste final (holdout): voltas 46-56 | Registros: 669
+Holdout RMSE: 0.3686
+Holdout MAE: 0.2826
+Holdout R2: 0.9468
+Holdout RMSE IC95%: [0.3463, 0.3920]
+Holdout MAE IC95%: [0.2646, 0.3008]
+Holdout R2 IC95%: [0.9390, 0.9533]

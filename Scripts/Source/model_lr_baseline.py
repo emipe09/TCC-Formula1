@@ -8,7 +8,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 
 # Configurar o Grande Prêmio desejado para carregar os dados correspondentes
-target_gp_name = 'Bahrain Grand Prix'
+target_gp_name = os.environ.get('TARGET_GP_NAME', 'Bahrain Grand Prix')
 safe_gp_name = target_gp_name.lower().replace(' ', '_')
 
 # Definir os caminhos para ler o arquivo do ModelData

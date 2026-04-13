@@ -7,7 +7,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import json
 
 # Configurar o Grande Prêmio desejado para carregar os dados correspondentes
-target_gp_name = 'Bahrain Grand Prix'
+target_gp_name = os.environ.get('TARGET_GP_NAME', 'Bahrain Grand Prix')
 safe_gp_name = target_gp_name.lower().replace(' ', '_')
 
 # Definir os caminhos para ler o arquivo do ModelData
@@ -67,16 +67,25 @@ lap_min = int(X_raw[LAP_COL].min())
 lap_max = int(X_raw[LAP_COL].max())
 total_laps = lap_max - lap_min + 1
 
-utils_dir = os.path.join(parent_dir, 'Utils')
-json_path = os.path.join(utils_dir, f"{safe_gp_name}_xgb_params.json")
+json_candidates = [
+    os.path.join(parent_dir, 'Results', 'xgboost', 'cv', 'params', f"{safe_gp_name}_xgb_params_cv.json"),
+    os.path.join(parent_dir, 'Results', 'xgboost', 'cv', 'params', f"{safe_gp_name}_xgb_params.json"),
+    os.path.join(parent_dir, 'Utils', f"{safe_gp_name}_xgb_params.json"),
+]
 
-if os.path.exists(json_path):
+json_path = None
+for candidate in json_candidates:
+    if os.path.exists(candidate):
+        json_path = candidate
+        break
+
+if json_path is not None:
     with open(json_path, 'r') as f:
         optuna_params_train = json.load(f)
     num_boost_round = optuna_params_train.pop("n_estimators", 500)
-    print(f"Parâmetros Optuna carregados de Utils!")
+    print(f"Parametros Optuna carregados de: {json_path}")
 else:
-    print("Nenhum parâmetro anterior encontrado. Usando default.")
+    print("Nenhum parametro anterior encontrado. Usando default.")
     optuna_params_train = {"objective": "reg:squarederror", "tree_method": "hist", "eval_metric": "rmse", "seed": 42}
     num_boost_round = 500
 

@@ -1,0 +1,48 @@
+Carregando dados limpos de:
+c:\Users\mpoli\Desktop\UFOP\9 PERIODO\TCC\Scripts\ModelData\Bahrain Grand Prix\bahrain_grand_prix_cleaned_data.csv
+--- PREPARACAO PARA REGRESSAO LINEAR (DRIVER ONE-HOT) ---
+
+--- SPLIT SEQUENCIAL DEFINIDO ---
+Pista: Bahrain Grand Prix
+Total de voltas consideradas: 55 (LapNumber 3-57)
+Holdout (20% final): voltas 47-57 | Total de voltas: 11 | Registros: 620
+Modelagem (80% iniciais): voltas 3-46 | Total de voltas: 44 | Registros: 2541
+
+--- SLIDING WINDOW CONFIGURADO (DENTRO DOS 80% DE MODELAGEM) ---
+window_ratio=0.20 | window_size=509 | train/val interno=407/102 | step_size=102 | janelas=21
+
+--- AVALIACAO INTERNA POR SLIDING WINDOW (DENTRO DOS 80%) ---
+Janela 1 | treino LapNumber 3-8 (n=407) | val LapNumber 8-10 (n=102) | RMSE=0.3118 | R2=0.9494
+Janela 2 | treino LapNumber 4-10 (n=407) | val LapNumber 10-12 (n=102) | RMSE=0.3171 | R2=0.9472
+Janela 3 | treino LapNumber 5-12 (n=407) | val LapNumber 12-14 (n=102) | RMSE=0.3397 | R2=0.9541
+Janela 4 | treino LapNumber 7-14 (n=407) | val LapNumber 14-16 (n=102) | RMSE=0.3516 | R2=0.9431
+Janela 5 | treino LapNumber 8-16 (n=407) | val LapNumber 16-18 (n=102) | RMSE=0.3969 | R2=0.9273
+Janela 6 | treino LapNumber 10-18 (n=407) | val LapNumber 18-20 (n=102) | RMSE=0.3070 | R2=0.9179
+Janela 7 | treino LapNumber 12-20 (n=407) | val LapNumber 20-21 (n=102) | RMSE=0.2670 | R2=0.9110
+Janela 8 | treino LapNumber 14-21 (n=407) | val LapNumber 21-23 (n=102) | RMSE=0.2809 | R2=0.9340
+Janela 9 | treino LapNumber 16-23 (n=407) | val LapNumber 23-24 (n=102) | RMSE=0.2648 | R2=0.9483
+Janela 10 | treino LapNumber 18-24 (n=407) | val LapNumber 24-25 (n=102) | RMSE=0.2720 | R2=0.9417
+Janela 11 | treino LapNumber 20-25 (n=407) | val LapNumber 26-27 (n=102) | RMSE=0.2718 | R2=0.9506
+Janela 12 | treino LapNumber 21-27 (n=407) | val LapNumber 27-29 (n=102) | RMSE=0.2861 | R2=0.9501
+Janela 13 | treino LapNumber 23-29 (n=407) | val LapNumber 29-31 (n=102) | RMSE=0.2983 | R2=0.9552
+Janela 14 | treino LapNumber 24-31 (n=407) | val LapNumber 31-33 (n=102) | RMSE=0.2852 | R2=0.9612
+Janela 15 | treino LapNumber 26-33 (n=407) | val LapNumber 33-35 (n=102) | RMSE=0.3129 | R2=0.9444
+Janela 16 | treino LapNumber 27-35 (n=407) | val LapNumber 36-38 (n=102) | RMSE=0.4057 | R2=0.8931
+Janela 17 | treino LapNumber 29-38 (n=407) | val LapNumber 38-39 (n=102) | RMSE=0.3623 | R2=0.9049
+Janela 18 | treino LapNumber 31-39 (n=407) | val LapNumber 39-41 (n=102) | RMSE=0.3315 | R2=0.9415
+Janela 19 | treino LapNumber 33-41 (n=407) | val LapNumber 41-43 (n=102) | RMSE=0.2861 | R2=0.9511
+Janela 20 | treino LapNumber 36-43 (n=407) | val LapNumber 43-45 (n=102) | RMSE=0.2922 | R2=0.9418
+Janela 21 | treino LapNumber 38-44 (n=407) | val LapNumber 44-46 (n=102) | RMSE=0.3008 | R2=0.9348
+
+--- TREINANDO MODELO FINAL (BASE DE MODELAGEM 80%) ---
+
+--- RESULTADO FINAL REGRESSAO LINEAR ---
+RMSE Medio: 0.3115 IC95%: [0.2932, 0.3299]
+MAE Medio: 0.2399 IC95%: [0.2261, 0.2536]
+R2 Medio: 0.9382 IC95%: [0.9301, 0.9463]
+
+--- TESTE FINAL NO HOLDOUT SEQUENCIAL (20%) ---
+Teste final (holdout): voltas 47-57 | Registros: 620
+Holdout RMSE: 0.2897
+Holdout MAE: 0.2257
+Holdout R2: 0.9393

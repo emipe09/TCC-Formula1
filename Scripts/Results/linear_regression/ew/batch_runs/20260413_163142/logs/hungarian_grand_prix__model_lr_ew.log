@@ -1,0 +1,35 @@
+
+Carregando dados limpos de:
+c:\Users\mpoli\Desktop\UFOP\9 PERIODO\TCC\Scripts\ModelData\Hungarian Grand Prix\hungarian_grand_prix_cleaned_data.csv
+--- PREPARACAO PARA REGRESSAO LINEAR (DRIVER ONE-HOT) ---
+
+--- SPLIT SEQUENCIAL DEFINIDO ---
+Pista: Hungarian Grand Prix
+Total de voltas consideradas: 68 (LapNumber 3-70)
+Holdout (20% final): voltas 57-70 | Total de voltas: 14 | Registros: 793
+Modelagem (80% iniciais): voltas 3-56 | Total de voltas: 54 | Registros: 3420
+
+--- EXPANDING WINDOW CONFIGURADO (DENTRO DOS 80% DE MODELAGEM) ---
+window_ratio=0.15 | janela_inicial=513 | expansao_por_etapa=513 | train_ratio=0.80 | janelas=7
+
+--- AVALIACAO INTERNA POR EXPANDING WINDOW (DENTRO DOS 80%) ---
+Janela 1 | treino LapNumber 3-9 (n=410) | val LapNumber 9-10 (n=103) | RMSE=0.3575 | R2=0.8986
+Janela 2 | treino LapNumber 3-15 (n=820) | val LapNumber 15-18 (n=206) | RMSE=0.3481 | R2=0.9292
+Janela 3 | treino LapNumber 3-21 (n=1231) | val LapNumber 21-26 (n=308) | RMSE=0.3624 | R2=0.9325
+Janela 4 | treino LapNumber 3-27 (n=1641) | val LapNumber 27-34 (n=411) | RMSE=0.3472 | R2=0.9251
+Janela 5 | treino LapNumber 3-34 (n=2052) | val LapNumber 34-42 (n=513) | RMSE=0.3195 | R2=0.9390
+Janela 6 | treino LapNumber 3-40 (n=2462) | val LapNumber 40-51 (n=616) | RMSE=0.3241 | R2=0.9484
+Janela 7 | treino LapNumber 3-45 (n=2736) | val LapNumber 45-56 (n=684) | RMSE=0.3463 | R2=0.9448
+
+--- TREINANDO MODELO FINAL (BASE DE MODELAGEM 80%) ---
+
+--- RESULTADO FINAL REGRESSAO LINEAR ---
+RMSE Medio: 0.3436 IC95%: [0.3287, 0.3584]
+MAE Medio: 0.2642 IC95%: [0.2519, 0.2764]
+R2 Medio: 0.9311 IC95%: [0.9158, 0.9464]
+
+--- TESTE FINAL NO HOLDOUT SEQUENCIAL (20%) ---
+Teste final (holdout): voltas 57-70 | Registros: 793
+Holdout RMSE: 0.3832
+Holdout MAE: 0.2959
+Holdout R2: 0.9339

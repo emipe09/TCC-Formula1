@@ -2,7 +2,6 @@ import pandas as pd
 import numpy as np
 import os
 import scipy.stats as stats
-from sklearn.model_selection import KFold
 from sklearn.linear_model import LinearRegression
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
@@ -167,21 +166,80 @@ y_model = y.loc[model_idx]
 X_holdout = X.loc[holdout_idx]
 y_holdout = y.loc[holdout_idx]
 
+# Ordena a base de modelagem por volta para validacao temporal via sliding window.
+model_lap_series = lap_series.loc[model_idx]
+model_order_idx = model_lap_series.sort_values(kind='mergesort').index
+X_model = X_model.loc[model_order_idx].reset_index(drop=True)
+y_model = y_model.loc[model_order_idx].reset_index(drop=True)
+lap_model_sorted = model_lap_series.loc[model_order_idx].reset_index(drop=True)
+
 print('\n--- SPLIT SEQUENCIAL DEFINIDO ---')
 print(f'Pista: {target_gp_name}')
 print(f'Total de voltas consideradas: {total_laps_track} (LapNumber {lap_min}-{lap_max})')
 print(f'Holdout (20% final): voltas {holdout_start_lap}-{lap_max} | Total de voltas: {holdout_laps} | Registros: {len(X_holdout)}')
 print(f'Modelagem (80% iniciais): voltas {lap_min}-{model_end_lap} | Total de voltas: {total_laps_track - holdout_laps} | Registros: {len(X_model)}')
 
-print('\n--- AVALIACAO INTERNA POR K-FOLD (DENTRO DOS 80%) ---')
-kf = KFold(n_splits=5, shuffle=True, random_state=42)
-results_lr = {'fold': [], 'rmse': [], 'mae': [], 'r2': []}
+WINDOW_RATIO = 0.20
+WINDOW_TRAIN_RATIO = 0.80
+WINDOW_STEP_RATIO = 0.20
 
-for i, (train_idx, val_idx) in enumerate(kf.split(X_model), start=1):
-    X_tr = X_model.iloc[train_idx]
-    y_tr = y_model.iloc[train_idx]
-    X_va = X_model.iloc[val_idx]
-    y_va = y_model.iloc[val_idx]
+def build_sliding_windows(n_samples, window_ratio, train_ratio, step_ratio):
+    if n_samples < 2:
+        raise ValueError('Dados insuficientes para sliding window (minimo 2 registros).')
+
+    window_size = int(np.ceil(n_samples * window_ratio))
+    window_size = max(5, window_size)
+    window_size = min(window_size, n_samples)
+
+    train_size = int(np.floor(window_size * train_ratio))
+    train_size = max(1, train_size)
+    if train_size >= window_size:
+        train_size = window_size - 1
+
+    val_size = window_size - train_size
+    if val_size < 1:
+        raise ValueError('Janela invalida: parte de validacao ficou vazia.')
+
+    step_size = int(np.ceil(window_size * step_ratio))
+    step_size = max(1, step_size)
+
+    windows = []
+    start = 0
+    while start + window_size <= n_samples:
+        end = start + window_size
+        split = start + train_size
+        windows.append((start, split, end))
+        start += step_size
+
+    last_start = n_samples - window_size
+    if not windows or windows[-1][0] != last_start:
+        end = last_start + window_size
+        split = last_start + train_size
+        windows.append((last_start, split, end))
+
+    return windows, window_size, train_size, val_size, step_size
+
+sliding_windows, window_size, train_size, val_size, step_size = build_sliding_windows(
+    n_samples=len(X_model),
+    window_ratio=WINDOW_RATIO,
+    train_ratio=WINDOW_TRAIN_RATIO,
+    step_ratio=WINDOW_STEP_RATIO,
+)
+
+print('\n--- SLIDING WINDOW CONFIGURADO (DENTRO DOS 80% DE MODELAGEM) ---')
+print(
+    f'window_ratio={WINDOW_RATIO:.2f} | window_size={window_size} | '
+    f'train/val interno={train_size}/{val_size} | step_size={step_size} | janelas={len(sliding_windows)}'
+)
+
+print('\n--- AVALIACAO INTERNA POR SLIDING WINDOW (DENTRO DOS 80%) ---')
+results_lr = {'window': [], 'rmse': [], 'mae': [], 'r2': []}
+
+for i, (start, split, end) in enumerate(sliding_windows, start=1):
+    X_tr = X_model.iloc[start:split]
+    y_tr = y_model.iloc[start:split]
+    X_va = X_model.iloc[split:end]
+    y_va = y_model.iloc[split:end]
 
     preds, _, _, _ = fit_predict_linear_regression(X_tr, y_tr, X_va)
 
@@ -189,12 +247,21 @@ for i, (train_idx, val_idx) in enumerate(kf.split(X_model), start=1):
     mae_val = mean_absolute_error(y_va, preds)
     r2_val = r2_score(y_va, preds)
 
-    results_lr['fold'].append(i)
+    results_lr['window'].append(i)
     results_lr['rmse'].append(rmse_val)
     results_lr['mae'].append(mae_val)
     results_lr['r2'].append(r2_val)
 
-    print(f'Fold {i} | treino={len(X_tr)} | val={len(X_va)} | RMSE={rmse_val:.4f} | R2={r2_val:.4f}')
+    train_lap_start = int(np.floor(lap_model_sorted.iloc[start]))
+    train_lap_end = int(np.floor(lap_model_sorted.iloc[split - 1]))
+    val_lap_start = int(np.floor(lap_model_sorted.iloc[split]))
+    val_lap_end = int(np.floor(lap_model_sorted.iloc[end - 1]))
+
+    print(
+        f'Janela {i} | treino LapNumber {train_lap_start}-{train_lap_end} (n={len(X_tr)}) | '
+        f'val LapNumber {val_lap_start}-{val_lap_end} (n={len(X_va)}) | '
+        f'RMSE={rmse_val:.4f} | R2={r2_val:.4f}'
+    )
 
 print('\n--- TREINANDO MODELO FINAL (BASE DE MODELAGEM 80%) ---')
 _, modelo_final, imputer_final, scaler_final = fit_predict_linear_regression(X_model, y_model, X_model)

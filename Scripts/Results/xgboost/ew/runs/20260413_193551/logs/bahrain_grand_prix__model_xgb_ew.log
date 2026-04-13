@@ -1,0 +1,41 @@
+Carregando dados limpos de:
+c:\Users\mpoli\Desktop\UFOP\9 PERIODO\TCC\Scripts\ModelData\Bahrain Grand Prix\bahrain_grand_prix_cleaned_data.csv
+--- PREPARAÇÃO PARA XGBOOST (SEM ONE_HOT_THRESH, DRIVER ONE-HOT) ---
+
+--- SPLIT SEQUENCIAL DEFINIDO ---
+Pista: Bahrain Grand Prix
+Total de voltas consideradas: 55 (LapNumber 3-57)
+Holdout (20% final): voltas 47-57 | Total de voltas: 11 | Registros: 620
+Modelagem (80% iniciais): voltas 3-46 | Total de voltas: 44 | Registros: 2541
+
+--- EXPANDING WINDOW CONFIGURADO (DENTRO DOS 80% DE MODELAGEM) ---
+window_ratio=0.20 | janela_inicial=509 | expansao_por_etapa=509 | train_ratio=0.80 | janelas=5
+
+--- TUNAGEM OPTUNA ---
+Usando parâmetros já salvos em: c:\Users\mpoli\Desktop\UFOP\9 PERIODO\TCC\Scripts\Results\xgboost\ew\params\bahrain_grand_prix_xgb_params_ew.json
+
+--- TREINANDO MODELO FINAL (BASE DE MODELAGEM 80%) ---
+
+Parâmetros Finais Otimizados:
+{'objective': 'reg:squarederror', 'tree_method': 'hist', 'eval_metric': 'rmse', 'seed': 42, 'learning_rate': 0.0315793982228788, 'max_depth': 8, 'min_child_weight': 6, 'subsample': 0.8260084230194668, 'colsample_bytree': 0.9677171291816455, 'gamma': 0.6419132231245768, 'reg_alpha': 1.2783022423089355e-08, 'reg_lambda': 0.062282775778752665, 'n_estimators': 622}
+
+[SUCESSO] Parametros do Optuna salvos em:
+c:\Users\mpoli\Desktop\UFOP\9 PERIODO\TCC\Scripts\Results\xgboost\ew\params\bahrain_grand_prix_xgb_params_ew.json
+
+--- AVALIAÇÃO INTERNA POR EXPANDING WINDOW (DENTRO DOS 80%) ---
+Janela 1 | treino LapNumber 3-8 (n=407) | val LapNumber 8-10 (n=102) | RMSE=0.3089 | R2=0.9503
+Janela 2 | treino LapNumber 3-16 (n=814) | val LapNumber 16-20 (n=204) | RMSE=0.4094 | R2=0.9015
+Janela 3 | treino LapNumber 3-23 (n=1221) | val LapNumber 23-27 (n=306) | RMSE=0.2800 | R2=0.9473
+Janela 4 | treino LapNumber 3-29 (n=1628) | val LapNumber 29-38 (n=408) | RMSE=0.3286 | R2=0.9463
+Janela 5 | treino LapNumber 3-38 (n=2032) | val LapNumber 38-46 (n=509) | RMSE=0.3403 | R2=0.9276
+
+--- RESULTADO FINAL XGBOOST ---
+RMSE Médio: 0.3334 IC95%: [0.2736, 0.3933]
+MAE Médio: 0.2562 IC95%: [0.2154, 0.2970]
+R2 Médio: 0.9346 IC95%: [0.9091, 0.9601]
+
+--- TESTE FINAL NO HOLDOUT SEQUENCIAL (20%) ---
+Teste final (holdout): voltas 47-57 | Registros: 620
+Holdout RMSE: 0.2980 IC95%: [0.2799, 0.3144]
+Holdout MAE: 0.2310 IC95%: [0.2151, 0.2452]
+Holdout R2: 0.9358 IC95%: [0.9269, 0.9438]
