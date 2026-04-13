@@ -1,0 +1,48 @@
+Carregando dados limpos de:
+c:\Users\mpoli\Desktop\UFOP\9 PERIODO\TCC\Scripts\ModelData\Hungarian Grand Prix\hungarian_grand_prix_cleaned_data.csv
+--- PREPARACAO PARA REGRESSAO LINEAR (DRIVER ONE-HOT) ---
+
+--- SPLIT SEQUENCIAL DEFINIDO ---
+Pista: Hungarian Grand Prix
+Total de voltas consideradas: 68 (LapNumber 3-70)
+Holdout (20% final): voltas 57-70 | Total de voltas: 14 | Registros: 793
+Modelagem (80% iniciais): voltas 3-56 | Total de voltas: 54 | Registros: 3420
+
+--- SLIDING WINDOW CONFIGURADO (DENTRO DOS 80% DE MODELAGEM) ---
+window_ratio=0.20 | window_size=684 | train/val interno=547/137 | step_size=137 | janelas=21
+
+--- AVALIACAO INTERNA POR SLIDING WINDOW (DENTRO DOS 80%) ---
+Janela 1 | treino LapNumber 3-11 (n=547) | val LapNumber 11-13 (n=137) | RMSE=0.3170 | R2=0.9116
+Janela 2 | treino LapNumber 5-13 (n=547) | val LapNumber 13-15 (n=137) | RMSE=0.3950 | R2=0.8905
+Janela 3 | treino LapNumber 7-15 (n=547) | val LapNumber 15-17 (n=137) | RMSE=0.3573 | R2=0.9237
+Janela 4 | treino LapNumber 9-17 (n=547) | val LapNumber 17-19 (n=137) | RMSE=0.3608 | R2=0.9281
+Janela 5 | treino LapNumber 11-19 (n=547) | val LapNumber 19-21 (n=137) | RMSE=0.3437 | R2=0.9271
+Janela 6 | treino LapNumber 13-21 (n=547) | val LapNumber 21-24 (n=137) | RMSE=0.3925 | R2=0.9174
+Janela 7 | treino LapNumber 15-24 (n=547) | val LapNumber 24-25 (n=137) | RMSE=0.3188 | R2=0.9479
+Janela 8 | treino LapNumber 17-25 (n=547) | val LapNumber 25-27 (n=137) | RMSE=0.3239 | R2=0.9446
+Janela 9 | treino LapNumber 19-27 (n=547) | val LapNumber 27-30 (n=137) | RMSE=0.3642 | R2=0.9239
+Janela 10 | treino LapNumber 21-30 (n=547) | val LapNumber 30-32 (n=137) | RMSE=0.3517 | R2=0.9103
+Janela 11 | treino LapNumber 24-32 (n=547) | val LapNumber 32-34 (n=137) | RMSE=0.3511 | R2=0.9264
+Janela 12 | treino LapNumber 26-34 (n=547) | val LapNumber 34-36 (n=137) | RMSE=0.4158 | R2=0.9011
+Janela 13 | treino LapNumber 27-36 (n=547) | val LapNumber 36-38 (n=137) | RMSE=0.3287 | R2=0.9321
+Janela 14 | treino LapNumber 30-38 (n=547) | val LapNumber 38-40 (n=137) | RMSE=0.3611 | R2=0.9185
+Janela 15 | treino LapNumber 32-40 (n=547) | val LapNumber 40-43 (n=137) | RMSE=0.3287 | R2=0.9370
+Janela 16 | treino LapNumber 34-43 (n=547) | val LapNumber 43-45 (n=137) | RMSE=0.3135 | R2=0.9446
+Janela 17 | treino LapNumber 36-45 (n=547) | val LapNumber 45-48 (n=137) | RMSE=0.3544 | R2=0.9338
+Janela 18 | treino LapNumber 38-48 (n=547) | val LapNumber 48-50 (n=137) | RMSE=0.3562 | R2=0.9410
+Janela 19 | treino LapNumber 41-50 (n=547) | val LapNumber 50-52 (n=137) | RMSE=0.3374 | R2=0.9455
+Janela 20 | treino LapNumber 43-52 (n=547) | val LapNumber 52-54 (n=137) | RMSE=0.3199 | R2=0.9473
+Janela 21 | treino LapNumber 45-54 (n=547) | val LapNumber 54-56 (n=137) | RMSE=0.4413 | R2=0.9247
+
+--- TREINANDO MODELO FINAL (BASE DE MODELAGEM 80%) ---
+
+--- RESULTADO FINAL REGRESSAO LINEAR ---
+RMSE Medio: 0.3540 IC95%: [0.3386, 0.3693]
+MAE Medio: 0.2722 IC95%: [0.2624, 0.2821]
+R2 Medio: 0.9275 IC95%: [0.9204, 0.9346]
+
+--- TESTE FINAL NO HOLDOUT SEQUENCIAL (20%) ---
+Teste final (holdout): voltas 57-70 | Registros: 793
+Holdout RMSE: 0.3832
+Holdout MAE: 0.2959
+Holdout R2: 0.9339

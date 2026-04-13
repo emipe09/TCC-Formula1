@@ -1,0 +1,41 @@
+Carregando dados limpos de:
+c:\Users\mpoli\Desktop\UFOP\9 PERIODO\TCC\Scripts\ModelData\Hungarian Grand Prix\hungarian_grand_prix_cleaned_data.csv
+--- PREPARAÇÃO PARA XGBOOST (SEM ONE_HOT_THRESH, DRIVER ONE-HOT) ---
+
+--- SPLIT SEQUENCIAL DEFINIDO ---
+Pista: Hungarian Grand Prix
+Total de voltas consideradas: 68 (LapNumber 3-70)
+Holdout (20% final): voltas 57-70 | Total de voltas: 14 | Registros: 793
+Modelagem (80% iniciais): voltas 3-56 | Total de voltas: 54 | Registros: 3420
+
+--- EXPANDING WINDOW CONFIGURADO (DENTRO DOS 80% DE MODELAGEM) ---
+window_ratio=0.20 | janela_inicial=684 | expansao_por_etapa=684 | train_ratio=0.80 | janelas=5
+
+--- TUNAGEM OPTUNA ---
+Usando parâmetros já salvos em: c:\Users\mpoli\Desktop\UFOP\9 PERIODO\TCC\Scripts\Results\xgboost\ew\params\hungarian_grand_prix_xgb_params_ew.json
+
+--- TREINANDO MODELO FINAL (BASE DE MODELAGEM 80%) ---
+
+Parâmetros Finais Otimizados:
+{'objective': 'reg:squarederror', 'tree_method': 'hist', 'eval_metric': 'rmse', 'seed': 42, 'learning_rate': 0.030413970360092486, 'max_depth': 3, 'min_child_weight': 6, 'subsample': 0.7526119626566625, 'colsample_bytree': 0.6902794766839278, 'gamma': 0.06948779089508372, 'reg_alpha': 1.6446237273004394e-05, 'reg_lambda': 0.0014395774309797118, 'n_estimators': 321}
+
+[SUCESSO] Parametros do Optuna salvos em:
+c:\Users\mpoli\Desktop\UFOP\9 PERIODO\TCC\Scripts\Results\xgboost\ew\params\hungarian_grand_prix_xgb_params_ew.json
+
+--- AVALIAÇÃO INTERNA POR EXPANDING WINDOW (DENTRO DOS 80%) ---
+Janela 1 | treino LapNumber 3-11 (n=547) | val LapNumber 11-13 (n=137) | RMSE=0.3275 | R2=0.9056
+Janela 2 | treino LapNumber 3-19 (n=1094) | val LapNumber 19-23 (n=274) | RMSE=0.3752 | R2=0.9199
+Janela 3 | treino LapNumber 3-27 (n=1641) | val LapNumber 27-34 (n=411) | RMSE=0.3775 | R2=0.9115
+Janela 4 | treino LapNumber 3-36 (n=2188) | val LapNumber 36-45 (n=548) | RMSE=0.3332 | R2=0.9362
+Janela 5 | treino LapNumber 3-45 (n=2736) | val LapNumber 45-56 (n=684) | RMSE=0.3983 | R2=0.9270
+
+--- RESULTADO FINAL XGBOOST ---
+RMSE Médio: 0.3623 IC95%: [0.3243, 0.4004]
+MAE Médio: 0.2752 IC95%: [0.2442, 0.3061]
+R2 Médio: 0.9200 IC95%: [0.9050, 0.9351]
+
+--- TESTE FINAL NO HOLDOUT SEQUENCIAL (20%) ---
+Teste final (holdout): voltas 57-70 | Registros: 793
+Holdout RMSE: 0.3925 IC95%: [0.3714, 0.4128]
+Holdout MAE: 0.3024 IC95%: [0.2863, 0.3204]
+Holdout R2: 0.9307 IC95%: [0.9215, 0.9388]

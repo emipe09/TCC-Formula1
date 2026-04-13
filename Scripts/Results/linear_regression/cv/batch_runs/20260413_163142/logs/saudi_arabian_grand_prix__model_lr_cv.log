@@ -1,0 +1,29 @@
+Carregando dados limpos de:
+c:\Users\mpoli\Desktop\UFOP\9 PERIODO\TCC\Scripts\ModelData\Saudi Arabian Grand Prix\saudi_arabian_grand_prix_cleaned_data.csv
+--- PREPARACAO PARA REGRESSAO LINEAR (DRIVER ONE-HOT) ---
+
+--- SPLIT SEQUENCIAL DEFINIDO ---
+Pista: Saudi Arabian Grand Prix
+Total de voltas consideradas: 48 (LapNumber 3-50)
+Holdout (20% final): voltas 41-50 | Total de voltas: 10 | Registros: 581
+Modelagem (80% iniciais): voltas 3-40 | Total de voltas: 38 | Registros: 2079
+
+--- AVALIACAO INTERNA POR K-FOLD (DENTRO DOS 80%) ---
+Fold 1 | treino=1663 | val=416 | RMSE=0.3426 | R2=0.9283
+Fold 2 | treino=1663 | val=416 | RMSE=0.3521 | R2=0.9222
+Fold 3 | treino=1663 | val=416 | RMSE=0.3290 | R2=0.9295
+Fold 4 | treino=1663 | val=416 | RMSE=0.3273 | R2=0.9326
+Fold 5 | treino=1664 | val=415 | RMSE=0.3466 | R2=0.9287
+
+--- TREINANDO MODELO FINAL (BASE DE MODELAGEM 80%) ---
+
+--- RESULTADO FINAL REGRESSAO LINEAR ---
+RMSE Medio: 0.3395 IC95%: [0.3259, 0.3531]
+MAE Medio: 0.2640 IC95%: [0.2507, 0.2772]
+R2 Medio: 0.9282 IC95%: [0.9236, 0.9329]
+
+--- TESTE FINAL NO HOLDOUT SEQUENCIAL (20%) ---
+Teste final (holdout): voltas 41-50 | Registros: 581
+Holdout RMSE: 0.3376
+Holdout MAE: 0.2601
+Holdout R2: 0.8684

@@ -1,0 +1,34 @@
+Carregando dados limpos de:
+c:\Users\mpoli\Desktop\UFOP\9 PERIODO\TCC\Scripts\ModelData\United States Grand Prix\united_states_grand_prix_cleaned_data.csv
+--- PREPARACAO PARA REGRESSAO LINEAR (DRIVER ONE-HOT) ---
+
+--- SPLIT SEQUENCIAL DEFINIDO ---
+Pista: United States Grand Prix
+Total de voltas consideradas: 54 (LapNumber 3-56)
+Holdout (20% final): voltas 46-56 | Total de voltas: 11 | Registros: 669
+Modelagem (80% iniciais): voltas 3-45 | Total de voltas: 43 | Registros: 2394
+
+--- EXPANDING WINDOW CONFIGURADO (DENTRO DOS 80% DE MODELAGEM) ---
+window_ratio=0.15 | janela_inicial=360 | expansao_por_etapa=360 | train_ratio=0.80 | janelas=7
+
+--- AVALIACAO INTERNA POR EXPANDING WINDOW (DENTRO DOS 80%) ---
+Janela 1 | treino LapNumber 3-8 (n=288) | val LapNumber 8-10 (n=72) | RMSE=0.5458 | R2=0.9014
+Janela 2 | treino LapNumber 3-13 (n=576) | val LapNumber 13-15 (n=144) | RMSE=0.3718 | R2=0.9347
+Janela 3 | treino LapNumber 3-18 (n=864) | val LapNumber 18-23 (n=216) | RMSE=0.3550 | R2=0.9071
+Janela 4 | treino LapNumber 3-24 (n=1152) | val LapNumber 24-29 (n=288) | RMSE=0.3611 | R2=0.9319
+Janela 5 | treino LapNumber 3-29 (n=1440) | val LapNumber 29-36 (n=360) | RMSE=0.3387 | R2=0.9565
+Janela 6 | treino LapNumber 3-34 (n=1728) | val LapNumber 34-42 (n=432) | RMSE=0.3243 | R2=0.9603
+Janela 7 | treino LapNumber 3-38 (n=1915) | val LapNumber 38-45 (n=479) | RMSE=0.3263 | R2=0.9569
+
+--- TREINANDO MODELO FINAL (BASE DE MODELAGEM 80%) ---
+
+--- RESULTADO FINAL REGRESSAO LINEAR ---
+RMSE Medio: 0.3747 IC95%: [0.3030, 0.4464]
+MAE Medio: 0.2975 IC95%: [0.2371, 0.3579]
+R2 Medio: 0.9355 IC95%: [0.9132, 0.9579]
+
+--- TESTE FINAL NO HOLDOUT SEQUENCIAL (20%) ---
+Teste final (holdout): voltas 46-56 | Registros: 669
+Holdout RMSE: 0.3686
+Holdout MAE: 0.2826
+Holdout R2: 0.9468

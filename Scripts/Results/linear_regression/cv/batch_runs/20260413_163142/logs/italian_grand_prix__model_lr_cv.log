@@ -1,0 +1,29 @@
+Carregando dados limpos de:
+c:\Users\mpoli\Desktop\UFOP\9 PERIODO\TCC\Scripts\ModelData\Italian Grand Prix\italian_grand_prix_cleaned_data.csv
+--- PREPARACAO PARA REGRESSAO LINEAR (DRIVER ONE-HOT) ---
+
+--- SPLIT SEQUENCIAL DEFINIDO ---
+Pista: Italian Grand Prix
+Total de voltas consideradas: 51 (LapNumber 3-53)
+Holdout (20% final): voltas 43-53 | Total de voltas: 11 | Registros: 510
+Modelagem (80% iniciais): voltas 3-42 | Total de voltas: 40 | Registros: 2484
+
+--- AVALIACAO INTERNA POR K-FOLD (DENTRO DOS 80%) ---
+Fold 1 | treino=1987 | val=497 | RMSE=0.2790 | R2=0.9704
+Fold 2 | treino=1987 | val=497 | RMSE=0.2726 | R2=0.9708
+Fold 3 | treino=1987 | val=497 | RMSE=0.2688 | R2=0.9719
+Fold 4 | treino=1987 | val=497 | RMSE=0.2669 | R2=0.9725
+Fold 5 | treino=1988 | val=496 | RMSE=0.2548 | R2=0.9762
+
+--- TREINANDO MODELO FINAL (BASE DE MODELAGEM 80%) ---
+
+--- RESULTADO FINAL REGRESSAO LINEAR ---
+RMSE Medio: 0.2684 IC95%: [0.2574, 0.2795]
+MAE Medio: 0.2087 IC95%: [0.1989, 0.2185]
+R2 Medio: 0.9723 IC95%: [0.9695, 0.9752]
+
+--- TESTE FINAL NO HOLDOUT SEQUENCIAL (20%) ---
+Teste final (holdout): voltas 43-53 | Registros: 510
+Holdout RMSE: 0.2972
+Holdout MAE: 0.2346
+Holdout R2: 0.9762

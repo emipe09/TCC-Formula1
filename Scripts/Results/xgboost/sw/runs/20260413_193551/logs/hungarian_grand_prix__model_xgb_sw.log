@@ -1,0 +1,57 @@
+Carregando dados limpos de:
+c:\Users\mpoli\Desktop\UFOP\9 PERIODO\TCC\Scripts\ModelData\Hungarian Grand Prix\hungarian_grand_prix_cleaned_data.csv
+--- PREPARAÇÃO PARA XGBOOST (SEM ONE_HOT_THRESH, DRIVER ONE-HOT) ---
+
+--- SPLIT SEQUENCIAL DEFINIDO ---
+Pista: Hungarian Grand Prix
+Total de voltas consideradas: 68 (LapNumber 3-70)
+Holdout (20% final): voltas 57-70 | Total de voltas: 14 | Registros: 793
+Modelagem (80% iniciais): voltas 3-56 | Total de voltas: 54 | Registros: 3420
+
+--- SLIDING WINDOW CONFIGURADO (DENTRO DOS 80% DE MODELAGEM) ---
+window_ratio=0.20 | window_size=684 | train/val interno=547/137 | step_size=137 | janelas=21
+
+--- TUNAGEM OPTUNA ---
+Usando parâmetros já salvos em: c:\Users\mpoli\Desktop\UFOP\9 PERIODO\TCC\Scripts\Results\xgboost\sw\params\hungarian_grand_prix_xgb_params_sw.json
+
+--- TREINANDO MODELO FINAL (BASE DE MODELAGEM 80%) ---
+
+Parâmetros Finais Otimizados:
+{'objective': 'reg:squarederror', 'tree_method': 'hist', 'eval_metric': 'rmse', 'seed': 42, 'learning_rate': 0.06016554447577139, 'max_depth': 6, 'min_child_weight': 4, 'subsample': 0.7531399479120232, 'colsample_bytree': 0.8205974369566317, 'gamma': 0.4683379517190026, 'reg_alpha': 0.0032365310170320728, 'reg_lambda': 4.789455885504757e-05, 'n_estimators': 179}
+
+[SUCESSO] Parametros do Optuna salvos em:
+c:\Users\mpoli\Desktop\UFOP\9 PERIODO\TCC\Scripts\Results\xgboost\sw\params\hungarian_grand_prix_xgb_params_sw.json
+
+--- AVALIAÇÃO INTERNA POR SLIDING WINDOW (DENTRO DOS 80%) ---
+Janela 1 | treino LapNumber 3-11 (n=547) | val LapNumber 11-13 (n=137) | RMSE=0.3235 | R2=0.9079
+Janela 2 | treino LapNumber 5-13 (n=547) | val LapNumber 13-15 (n=137) | RMSE=0.3738 | R2=0.9019
+Janela 3 | treino LapNumber 7-15 (n=547) | val LapNumber 15-17 (n=137) | RMSE=0.3544 | R2=0.9249
+Janela 4 | treino LapNumber 9-17 (n=547) | val LapNumber 17-19 (n=137) | RMSE=0.3671 | R2=0.9256
+Janela 5 | treino LapNumber 11-19 (n=547) | val LapNumber 19-21 (n=137) | RMSE=0.3636 | R2=0.9184
+Janela 6 | treino LapNumber 13-21 (n=547) | val LapNumber 21-24 (n=137) | RMSE=0.4078 | R2=0.9109
+Janela 7 | treino LapNumber 15-24 (n=547) | val LapNumber 24-25 (n=137) | RMSE=0.3216 | R2=0.9470
+Janela 8 | treino LapNumber 17-25 (n=547) | val LapNumber 25-27 (n=137) | RMSE=0.3139 | R2=0.9480
+Janela 9 | treino LapNumber 19-27 (n=547) | val LapNumber 27-30 (n=137) | RMSE=0.3639 | R2=0.9241
+Janela 10 | treino LapNumber 21-30 (n=547) | val LapNumber 30-32 (n=137) | RMSE=0.3379 | R2=0.9172
+Janela 11 | treino LapNumber 24-32 (n=547) | val LapNumber 32-34 (n=137) | RMSE=0.3801 | R2=0.9138
+Janela 12 | treino LapNumber 26-34 (n=547) | val LapNumber 34-36 (n=137) | RMSE=0.3797 | R2=0.9176
+Janela 13 | treino LapNumber 27-36 (n=547) | val LapNumber 36-38 (n=137) | RMSE=0.3399 | R2=0.9274
+Janela 14 | treino LapNumber 30-38 (n=547) | val LapNumber 38-40 (n=137) | RMSE=0.3631 | R2=0.9176
+Janela 15 | treino LapNumber 32-40 (n=547) | val LapNumber 40-43 (n=137) | RMSE=0.3285 | R2=0.9371
+Janela 16 | treino LapNumber 34-43 (n=547) | val LapNumber 43-45 (n=137) | RMSE=0.3640 | R2=0.9253
+Janela 17 | treino LapNumber 36-45 (n=547) | val LapNumber 45-48 (n=137) | RMSE=0.3730 | R2=0.9267
+Janela 18 | treino LapNumber 38-48 (n=547) | val LapNumber 48-50 (n=137) | RMSE=0.3628 | R2=0.9388
+Janela 19 | treino LapNumber 41-50 (n=547) | val LapNumber 50-52 (n=137) | RMSE=0.3583 | R2=0.9386
+Janela 20 | treino LapNumber 43-52 (n=547) | val LapNumber 52-54 (n=137) | RMSE=0.3588 | R2=0.9338
+Janela 21 | treino LapNumber 45-54 (n=547) | val LapNumber 54-56 (n=137) | RMSE=0.4757 | R2=0.9125
+
+--- RESULTADO FINAL XGBOOST ---
+RMSE Médio: 0.3624 IC95%: [0.3468, 0.3781]
+MAE Médio: 0.2726 IC95%: [0.2642, 0.2810]
+R2 Médio: 0.9245 IC95%: [0.9188, 0.9302]
+
+--- TESTE FINAL NO HOLDOUT SEQUENCIAL (20%) ---
+Teste final (holdout): voltas 57-70 | Registros: 793
+Holdout RMSE: 0.4055 IC95%: [0.3835, 0.4275]
+Holdout MAE: 0.3088 IC95%: [0.2914, 0.3268]
+Holdout R2: 0.9260 IC95%: [0.9159, 0.9351]
