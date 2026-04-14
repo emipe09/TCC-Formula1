@@ -1,4 +1,4 @@
-import pandas as pd
+﻿import pandas as pd
 import numpy as np
 import os
 import scipy.stats as stats
@@ -6,24 +6,24 @@ import xgboost as xgb
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import json
 
-# Configurar o Grande Prêmio desejado para carregar os dados correspondentes
+# Configure the target Grand Prix to load corresponding data
 target_gp_name = os.environ.get('TARGET_GP_NAME', 'Bahrain Grand Prix')
 safe_gp_name = target_gp_name.lower().replace(' ', '_')
 
-# Definir os caminhos para ler o arquivo do ModelData
+# Define paths to read the ModelData file
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 model_data_dir = os.path.join(parent_dir, 'ModelData', target_gp_name)
 input_csv_path = os.path.join(model_data_dir, f"{safe_gp_name}_cleaned_data.csv")
 
-print(f"Carregando dados limpos de:\n{input_csv_path}")
+print(f"Loading cleaned data from:\n{input_csv_path}")
 if not os.path.exists(input_csv_path):
-    raise FileNotFoundError(f"Arquivo não encontrado: {input_csv_path}. Execute o script_model_data.py primeiro.")
+    raise FileNotFoundError(f"File not found: {input_csv_path}. Run script_model_data.py first.")
 
-# Carregar o DataFrame
+# Load the DataFrame
 laps_cleaned = pd.read_csv(input_csv_path)
 
-# Preparação das colunas de base para XGBoost
+# Base feature preparation para XGBoost
 target_col = 'LapTime_seconds'
 df_base = laps_cleaned.copy() 
 
@@ -83,9 +83,9 @@ if json_path is not None:
     with open(json_path, 'r') as f:
         optuna_params_train = json.load(f)
     num_boost_round = optuna_params_train.pop("n_estimators", 500)
-    print(f"Parametros Optuna carregados de: {json_path}")
+    print(f"Parameters Optuna carregados de: {json_path}")
 else:
-    print("Nenhum parametro anterior encontrado. Usando default.")
+    print("No previous parameter file found. Using defaults.")
     optuna_params_train = {"objective": "reg:squarederror", "tree_method": "hist", "eval_metric": "rmse", "seed": 42}
     num_boost_round = 500
 
@@ -149,5 +149,8 @@ for ratio in window_ratios_to_test:
         comparison_results_xgb.append(res_row)
 
 df_comparison_xgb = pd.DataFrame(comparison_results_xgb)
-print("\n--- COMPARAÇÃO XGBOOST WALK FORWARD (WF) ---")
+print("\n--- COMPARAÃ‡ÃƒO XGBOOST WALK FORWARD (WF) ---")
 print(df_comparison_xgb.to_string(index=False))
+
+
+

@@ -1,4 +1,4 @@
-import argparse
+﻿import argparse
 import csv
 import json
 import os
@@ -10,7 +10,6 @@ from datetime import datetime
 from typing import Dict, List, Optional
 
 
-# Vetor de pistas (edite aqui quando quiser)
 TRACKS_TO_RUN = [
     "Bahrain Grand Prix",
     "Hungarian Grand Prix",
@@ -19,7 +18,6 @@ TRACKS_TO_RUN = [
     "United States Grand Prix",
 ]
 
-# Modelos que serao executados por padrao (chaves de AVAILABLE_MODELS)
 DEFAULT_MODELS_TO_RUN = [
     "model_lr_cv",
 ]
@@ -50,11 +48,10 @@ def parse_metric(output: str, metric: str, kind: str) -> Optional[float]:
     kind: 'mean' or 'holdout'
     """
     if kind == "mean":
-        # Ex: RMSE Medio: 1.2345 / RMSE Medio: / RMSE Medio:
-        # Ex: RMSE Medio / RMSE Medio com acento
         patterns = [
-            rf"{metric}\s+M[eEéÉ]dio:\s*([-+]?\d*\.?\d+)",
-            rf"{metric}\s+M[eEéÉ]dia:\s*([-+]?\d*\.?\d+)",
+            rf"{metric}\s+Mean:\s*([-+]?\d*\.?\d+)",
+            rf"{metric}\s+Mean:\s*([-+]?\d*\.?\d+)",
+            rf"{metric}\s+M[eE]dia:\s*([-+]?\d*\.?\d+)",
         ]
     else:
         patterns = [rf"Holdout\s+{metric}:\s*([-+]?\d*\.?\d+)"]
@@ -105,12 +102,12 @@ def run_one_model(
         stdout = completed.stdout or ""
         stderr = completed.stderr or ""
         output = f"{stdout}\n{stderr}".strip()
-        error_message = "" if status == "success" else (stderr.strip() or "Falha sem mensagem em stderr")
+        error_message = "" if status == "success" else (stderr.strip() or "Failure without stderr message")
         return_code = completed.returncode
     except subprocess.TimeoutExpired as exc:
         status = "timeout"
-        output = f"{(exc.stdout or "")}\n{(exc.stderr or "")}".strip()
-        error_message = f"Timeout apos {timeout_seconds} segundos"
+        output = f"{(exc.stdout or '')}\n{(exc.stderr or '')}".strip()
+        error_message = f"Timeout after {timeout_seconds} seconds"
         return_code = -1
 
     elapsed = round(time.time() - start, 2)
@@ -121,8 +118,8 @@ def run_one_model(
 
     log_filename = f"{safe_name(track_name)}__{model_key}.log"
     log_path = os.path.join(output_logs_dir, log_filename)
-    with open(log_path, "w", encoding="utf-8") as f:
-        f.write(output)
+    with open(log_path, "w", encoding="utf-8") as file:
+        file.write(output)
 
     record: Dict[str, object] = {
         "track": track_name,
@@ -169,8 +166,8 @@ def write_csv(csv_path: str, rows: List[Dict[str, object]]) -> None:
         "log_path",
     ]
 
-    with open(csv_path, "w", newline="", encoding="utf-8") as f:
-        writer = csv.DictWriter(f, fieldnames=fieldnames)
+    with open(csv_path, "w", newline="", encoding="utf-8") as file:
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
 
@@ -178,32 +175,32 @@ def write_csv(csv_path: str, rows: List[Dict[str, object]]) -> None:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Executa varios scripts de modelo para varias pistas e salva um consolidado de resultados."
+            "Runs multiple model scripts for multiple tracks and saves a consolidated results summary."
         )
     )
     parser.add_argument(
         "--tracks",
         nargs="+",
-        help="Lista de pistas. Se omitido, usa TRACKS_TO_RUN do script.",
+        help="List of tracks. If omitted, uses TRACKS_TO_RUN from this script.",
     )
     parser.add_argument(
         "--models",
         nargs="+",
         help=(
-            "Lista de modelos (chaves de AVAILABLE_MODELS). "
-            "Aceita com ou sem .py, ex: model_xgb_cv ou model_xgb_cv.py"
+            "List of models (AVAILABLE_MODELS keys). "
+            "Accepts with or without .py, e.g., model_xgb_cv or model_xgb_cv.py"
         ),
     )
     parser.add_argument(
         "--timeout",
         type=int,
         default=None,
-        help="Timeout em segundos para cada execucao individual. Padrao: sem timeout.",
+        help="Timeout in seconds for each individual execution. Default: no timeout.",
     )
     parser.add_argument(
         "--stop-on-error",
         action="store_true",
-        help="Para a execucao no primeiro erro.",
+        help="Stop execution on the first error.",
     )
     return parser.parse_args()
 
@@ -222,31 +219,29 @@ def main() -> None:
     tracks = args.tracks if args.tracks else TRACKS_TO_RUN
 
     if args.models:
-        model_keys = [normalize_model_key(m) for m in args.models]
+        model_keys = [normalize_model_key(model) for model in args.models]
     else:
         model_keys = DEFAULT_MODELS_TO_RUN
 
-    invalid_models = [m for m in model_keys if m not in AVAILABLE_MODELS]
+    invalid_models = [model for model in model_keys if model not in AVAILABLE_MODELS]
     if invalid_models:
         valid_keys = ", ".join(sorted(AVAILABLE_MODELS.keys()))
-        raise ValueError(
-            f"Modelos invalidos: {invalid_models}. Modelos validos: {valid_keys}"
-        )
+        raise ValueError(f"Invalid models: {invalid_models}. Valid models: {valid_keys}")
 
     total = len(tracks) * len(model_keys)
     count = 0
     rows: List[Dict[str, object]] = []
 
-    print("=== EXECUCAO EM LOTE DE MODELOS ===")
-    print(f"Pistas: {tracks}")
-    print(f"Modelos: {model_keys}")
-    print(f"Total de execucoes: {total}")
-    print(f"Pasta de saida: {output_dir}\n")
+    print("=== BATCH MODEL EXECUTION ===")
+    print(f"Tracks: {tracks}")
+    print(f"Models: {model_keys}")
+    print(f"Total executions: {total}")
+    print(f"Output folder: {output_dir}\n")
 
     for track in tracks:
         for model_key in model_keys:
             count += 1
-            print(f"[{count}/{total}] Rodando {model_key} em '{track}'...")
+            print(f"[{count}/{total}] Running {model_key} on '{track}'...")
             result = run_one_model(
                 source_dir=source_dir,
                 output_root_dir=results_root,
@@ -258,12 +253,12 @@ def main() -> None:
             rows.append(result)
 
             print(
-                f" -> status={result['status']} | duracao={result['duration_seconds']}s "
+                f" -> status={result['status']} | duration={result['duration_seconds']}s "
                 f"| rmse_mean={result['rmse_mean']} | rmse_holdout={result['rmse_holdout']}"
             )
 
             if result["status"] != "success" and args.stop_on_error:
-                print("Parando por causa de erro (--stop-on-error).")
+                print("Stopping due to error (--stop-on-error).")
                 break
 
         if args.stop_on_error and rows and rows[-1]["status"] != "success":
@@ -277,21 +272,24 @@ def main() -> None:
         "tracks": tracks,
         "models": model_keys,
         "total_runs": len(rows),
-        "success_runs": sum(1 for r in rows if r["status"] == "success"),
-        "failed_runs": sum(1 for r in rows if r["status"] in {"failed", "timeout"}),
+        "success_runs": sum(1 for row in rows if row["status"] == "success"),
+        "failed_runs": sum(1 for row in rows if row["status"] in {"failed", "timeout"}),
         "results": rows,
     }
 
-    with open(summary_json_path, "w", encoding="utf-8") as f:
-        json.dump(payload, f, indent=2, ensure_ascii=False)
+    with open(summary_json_path, "w", encoding="utf-8") as file:
+        json.dump(payload, file, indent=2, ensure_ascii=False)
 
     write_csv(summary_csv_path, rows)
 
-    print("\n=== FINALIZADO ===")
+    print("\n=== FINISHED ===")
     print(f"JSON: {summary_json_path}")
     print(f"CSV:  {summary_csv_path}")
-    print(f"Logs por modelo em: {results_root}/<family>/<approach>/runs/{run_id}/logs")
+    print(f"Model logs: {results_root}/<family>/<approach>/runs/{run_id}/logs")
 
 
 if __name__ == "__main__":
     main()
+
+
+

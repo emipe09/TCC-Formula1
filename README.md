@@ -1,36 +1,34 @@
-# TCC Formula 1 - Analise Preditiva de Tempo de Volta
+# TCC Formula 1 - Predictive Lap Time Analysis
 
-## Titulo
-Analise Multicircuito de Tempos de Volta na Formula 1: comparacao de abordagens de modelagem temporal para previsao e suporte estrategico.
+## Title
+Multi-Circuit Analysis of Formula 1 Lap Times: comparison of temporal modeling approaches for forecasting and strategy support.
 
-## Objetivo
-Este projeto desenvolve e compara modelos de Machine Learning para prever tempo de volta em corridas de Formula 1 usando dados historicos de 2022 a 2025.
+## Objective
+This project develops and compares Machine Learning models to predict lap time in Formula 1 races using historical data from 2022 to 2025.
 
-O foco atual do repositorio esta em:
-- comparacao entre Regressao Linear e XGBoost
-- comparacao entre abordagens de validacao temporal
-- avaliacao em holdout sequencial final
+Current repository focus:
+- comparison between Linear Regression and XGBoost
+- comparison between temporal validation strategies
+- evaluation on a final sequential holdout set
 
-## Principais Atualizacoes Implementadas
-As funcionalidades abaixo foram implementadas e consolidadas no codigo:
-
-1. Execucao multi-pistas automatizada com um unico script.
-2. Parametrizacao de pista via variavel de ambiente TARGET_GP_NAME em todos os modelos principais.
-3. Padronizacao do split temporal por LapNumber:
-   - 80% inicial para modelagem
-   - 20% final para holdout sequencial
-4. Organizacao dos resultados por familia e abordagem.
-5. Remocao do acoplamento com batch_runs no orquestrador atual.
-6. Inclusao de IC95% no holdout para cv, ew e sw (bootstrap) para:
+## Main Implemented Updates
+1. Automated multi-track execution with a single script.
+2. Track parameterization through the `TARGET_GP_NAME` environment variable across main models.
+3. Standardized temporal split by `LapNumber`:
+   - initial 80% for modeling
+   - final 20% for sequential holdout
+4. Organized results by model family and approach.
+5. Removed coupling with legacy `batch_runs` in the current orchestrator.
+6. Added holdout 95% confidence intervals for `cv`, `ew`, and `sw` (bootstrap) for:
    - RMSE
    - MAE
    - R2
 
-## Estrutura do Projeto
+## Project Structure
 
 ```text
 TCC/
-|- Bibliografia/
+|- Bibliography/
 |- Data/
 |  |- Bahrain/
 |  |- Hungary/
@@ -52,47 +50,35 @@ TCC/
 |  |  |- model_xgb_wf.py
 |  |- ModelData/
 |  |- Results/
-|  |  |- linear_regression/
-|  |  |  |- cv/
-|  |  |  |- ew/
-|  |  |  |- sw/
-|  |  |  |- wf/
-|  |  |- xgboost/
-|  |  |  |- cv/
-|  |  |  |  |- params/
-|  |  |  |- ew/
-|  |  |  |  |- params/
-|  |  |  |- sw/
-|  |  |  |  |- params/
-|  |  |- runs/
 |  |- fastf1_cache/
 |- Utils/
 |  |- compounds.json
 |  |- requirements.txt
+|- reproducibility_paths.json
 |- README.md
 ```
 
-Observacao:
-- Ainda podem existir pastas legadas de rodadas antigas dentro de alguns subdiretorios de resultados.
-- A estrutura ativa de execucao e salvamento atual e a descrita acima.
+Notes:
+- Legacy run folders may still exist inside some result subdirectories.
+- The active execution/output structure is the one described above.
 
-## Fluxo de Execucao
+## Execution Flow
 
-### 1) Gerar base limpa por pista
+### 1) Generate cleaned data by track
 
 ```bash
 python Scripts/Source/script_model_data.py
 ```
 
-Entrada esperada:
-- Data/<Pista>/...
+Expected input:
+- `Data/<Track>/...`
 
-Saida esperada:
-- Scripts/ModelData/<Grand Prix>/<safe_gp_name>_cleaned_data.csv
+Expected output:
+- `Scripts/ModelData/<Grand Prix>/<safe_gp_name>_cleaned_data.csv`
 
-### 2) Rodar modelos individualmente
+### 2) Run models individually
 
-Exemplos:
+Examples:
 
 ```bash
 python Scripts/Source/model_lr_cv.py
@@ -103,95 +89,92 @@ python Scripts/Source/model_xgb_ew.py
 python Scripts/Source/model_xgb_sw.py
 ```
 
-### 3) Rodar lote multi-pistas e multi-modelos
+### 3) Run multi-track and multi-model batch
 
 ```bash
 python Scripts/Source/run_all_models_tracks.py
 ```
 
-O orquestrador permite selecionar pistas e modelos e gera logs por execucao.
+The orchestrator allows selecting tracks and models and generates logs per run.
 
-## Parametrizacao por Pista
-Todos os scripts principais usam:
+## Track Parameterization
+Main scripts use:
+- `TARGET_GP_NAME` (environment variable)
 
-- TARGET_GP_NAME (variavel de ambiente)
+If the variable is not set, each script uses its internal default value.
 
-Se a variavel nao for informada, o script usa valor padrao definido no arquivo.
-
-Exemplo no PowerShell:
+PowerShell example:
 
 ```powershell
 $env:TARGET_GP_NAME = "United States Grand Prix"
 python Scripts/Source/model_xgb_sw.py
 ```
 
-## Abordagens de Validacao
+## Validation Approaches
 
 ### CV
-- validacao interna com K-Fold na base de modelagem (80%)
+- internal K-Fold validation on the modeling set (80%)
 
 ### EW
-- Expanding Window na base de modelagem (80%)
+- Expanding Window on the modeling set (80%)
 
 ### SW
-- Sliding Window na base de modelagem (80%)
+- Sliding Window on the modeling set (80%)
 
 ### WF
-- Walk-Forward (scripts especificos de WF)
+- Walk-Forward (WF-specific scripts)
 
-## Metricas e IC no Holdout
-Nos metodos cv, ew e sw, a avaliacao final inclui:
+## Metrics and Holdout CI
+For `cv`, `ew`, and `sw`, final evaluation includes:
 - Holdout RMSE
 - Holdout MAE
 - Holdout R2
-- Holdout IC95% de RMSE, MAE e R2 por bootstrap
+- Holdout 95% confidence interval for RMSE, MAE, and R2 via bootstrap
 
-Avaliacao interna continua sendo reportada por abordagem (CV, EW, SW).
+Internal evaluation remains reported by approach (CV, EW, SW).
 
-## Onde os Artefatos Sao Salvos
+## Artifact Locations
 
-### Parametros do XGBoost
-- Scripts/Results/xgboost/cv/params/*_xgb_params_cv.json
-- Scripts/Results/xgboost/ew/params/*_xgb_params_ew.json
-- Scripts/Results/xgboost/sw/params/*_xgb_params_sw.json
+### XGBoost Parameters
+- `Scripts/Results/xgboost/cv/params/*_xgb_params_cv.json`
+- `Scripts/Results/xgboost/ew/params/*_xgb_params_ew.json`
+- `Scripts/Results/xgboost/sw/params/*_xgb_params_sw.json`
 
-### Logs de execucao
-Padrao atual por familia/abordagem:
-- Scripts/Results/<familia>/<abordagem>/runs/<timestamp>/logs/*.log
+### Execution Logs
+Current structure by family/approach:
+- `Scripts/Results/<family>/<approach>/runs/<timestamp>/logs/*.log`
 
-### Sumarios do orquestrador
-- Scripts/Results/runs/<timestamp>/summary.json
-- Scripts/Results/runs/<timestamp>/summary.csv
+### Orchestrator Summaries
+- `Scripts/Results/runs/<timestamp>/summary.json`
+- `Scripts/Results/runs/<timestamp>/summary.csv`
 
-## Dependencias
-As dependencias estao em:
-- Utils/requirements.txt
+## Dependencies
+Dependencies are listed in:
+- `Utils/requirements.txt`
 
-Instalacao:
+Installation:
 
 ```bash
 pip install -r Utils/requirements.txt
 ```
 
-## Reproducao Rapida
+## Reproducibility
+The repository includes a machine-readable directory map for reproducibility:
+- `reproducibility_paths.json`
 
-1. Instalar dependencias.
-2. Garantir dados em Data/.
-3. Gerar dados limpos em Scripts/ModelData/.
-4. Rodar run_all_models_tracks.py para comparacao em lote.
-5. Consolidar resultados pelos logs e sumarios em Scripts/Results/.
+This file centralizes input/output directories and canonical script paths used to run the pipeline.
 
-## Status Atual
-- Pipeline funcional para 5 GPs: Bahrain, Hungary, Italy, Saudi Arabia, United States.
-- Comparacao ativa entre familias de modelos e abordagens temporais.
-- Estrutura de resultados reorganizada e padronizada.
-- IC95% no holdout implementado para cv, ew e sw.
+## Current Status
+- Functional pipeline for 5 GPs: Bahrain, Hungary, Italy, Saudi Arabia, United States.
+- Active comparison between model families and temporal approaches.
+- Reorganized and standardized result structure.
+- Holdout 95% confidence intervals implemented for `cv`, `ew`, and `sw`.
 
-## Autores
+## Authors
 - Marcos Paulo de Oliveira Pereira
 - Alexandre Magno de Sousa
 
-UFOP - Engenharia de Computacao
+UFOP - Computer Engineering
 
-## Licenca
-Uso academico.
+## License
+Academic use.

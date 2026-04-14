@@ -1,4 +1,4 @@
-import pandas as pd
+﻿import pandas as pd
 import numpy as np
 import os
 import json
@@ -7,7 +7,7 @@ import xgboost as xgb
 import optuna
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
-# Configurar o Grande Prêmio para carregar os dados
+# Configure the target Grand Prix to load data
 target_gp_name = os.environ.get('TARGET_GP_NAME', 'Bahrain Grand Prix')
 safe_gp_name = target_gp_name.lower().replace(' ', '_')
 
@@ -17,9 +17,9 @@ parent_dir = os.path.dirname(current_dir)
 model_data_dir = os.path.join(parent_dir, 'ModelData', target_gp_name)
 input_csv_path = os.path.join(model_data_dir, f"{safe_gp_name}_cleaned_data.csv")
 
-print(f"Carregando dados limpos de:\n{input_csv_path}")
+print(f"Loading cleaned data from:\n{input_csv_path}")
 if not os.path.exists(input_csv_path):
-    raise FileNotFoundError(f"Arquivo não encontrado: {input_csv_path}. Execute o script_model_data.py primeiro.")
+    raise FileNotFoundError(f"File not found: {input_csv_path}. Run script_model_data.py first.")
 
 laps_cleaned = pd.read_csv(input_csv_path)
 
@@ -105,7 +105,7 @@ valid_indices = y_raw.dropna().index
 X_raw = X_raw.loc[valid_indices]
 y_raw = y_raw.loc[valid_indices]
 
-print("--- PREPARAÇÃO PARA XGBOOST (SEM ONE_HOT_THRESH, DRIVER ONE-HOT) ---")
+print("--- PREPARATION FOR XGBOOST (SEM ONE_HOT_THRESH, DRIVER ONE-HOT) ---")
 
 X_proc = X_raw.copy()
 X_proc[cat_cols] = X_proc[cat_cols].fillna("Missing")
@@ -115,24 +115,24 @@ X_proc[num_cols_base] = X_proc[num_cols_base].fillna(X_proc[num_cols_base].media
 X = X_proc
 y = y_raw.copy()
 
-# Split sequencial por faixa de voltas: 80% para modelagem e 20% holdout final.
+# Sequential split by lap range: 80% for modeling and 20% final holdout.
 LAP_COL = "LapNumber"
 HOLDOUT_RATIO = 0.20
 
 if LAP_COL not in df_base.columns:
-    raise KeyError(f"Coluna '{LAP_COL}' não encontrada para split sequencial.")
+    raise KeyError(f"Column '{LAP_COL}' not found for sequential split.")
 
 lap_series = df_base.loc[valid_indices, LAP_COL]
 
 if lap_series.dropna().empty:
-    raise ValueError("Não há valores válidos de LapNumber para aplicar split sequencial.")
+    raise ValueError("No valid LapNumber values available for sequential split.")
 
 lap_min = int(np.floor(lap_series.min()))
 lap_max = int(np.floor(lap_series.max()))
 total_laps_track = lap_max - lap_min + 1
 
 if total_laps_track < 2:
-    raise ValueError("Número de voltas insuficiente para separar treino e holdout.")
+    raise ValueError("Insufficient number of laps to split train and holdout.")
 
 holdout_laps = max(1, int(np.ceil(total_laps_track * HOLDOUT_RATIO)))
 holdout_laps = min(holdout_laps, total_laps_track - 1)
@@ -147,7 +147,7 @@ holdout_idx = lap_series[holdout_mask].index
 
 if len(model_idx) == 0 or len(holdout_idx) == 0:
     raise ValueError(
-        "Split sequencial inválido: treino/modelagem ou holdout ficou vazio."
+        "Invalid sequential split: train/modeling ou holdout ficou vazio."
     )
 
 X_model = X.loc[model_idx]
@@ -155,18 +155,18 @@ y_model = y.loc[model_idx]
 X_holdout = X.loc[holdout_idx]
 y_holdout = y.loc[holdout_idx]
 
-# Ordena a base de modelagem por volta para validação temporal via sliding window.
+# Sort modeling data by lap for temporal validation using sliding windows.
 model_lap_series = lap_series.loc[model_idx]
 model_order_idx = model_lap_series.sort_values(kind="mergesort").index
 X_model = X_model.loc[model_order_idx].reset_index(drop=True)
 y_model = y_model.loc[model_order_idx].reset_index(drop=True)
 lap_model_sorted = model_lap_series.loc[model_order_idx].reset_index(drop=True)
 
-print("\n--- SPLIT SEQUENCIAL DEFINIDO ---")
-print(f"Pista: {target_gp_name}")
-print(f"Total de voltas consideradas: {total_laps_track} (LapNumber {lap_min}-{lap_max})")
-print(f"Holdout (20% final): voltas {holdout_start_lap}-{lap_max} | Total de voltas: {holdout_laps} | Registros: {len(X_holdout)}")
-print(f"Modelagem (80% iniciais): voltas {lap_min}-{model_end_lap} | Total de voltas: {total_laps_track - holdout_laps} | Registros: {len(X_model)}")
+print("\n--- SEQUENTIAL SPLIT DEFINED ---")
+print(f"Track: {target_gp_name}")
+print(f"Total laps considered: {total_laps_track} (LapNumber {lap_min}-{lap_max})")
+print(f"Holdout (final 20%): laps {holdout_start_lap}-{lap_max} | Total laps: {holdout_laps} | Records: {len(X_holdout)}")
+print(f"Modeling (initial 80%): laps {lap_min}-{model_end_lap} | Total laps: {total_laps_track - holdout_laps} | Records: {len(X_model)}")
 
 
 WINDOW_RATIO = 0.20
@@ -174,13 +174,13 @@ WINDOW_TRAIN_RATIO = 0.80
 
 def build_expanding_windows(n_samples, window_ratio, train_ratio):
     if n_samples < 2:
-        raise ValueError("Dados insuficientes para expanding window (mínimo 2 registros).")
+        raise ValueError("Insufficient data for expanding window (minimum 2 records).")
 
     base_window_size = int(np.ceil(n_samples * window_ratio))
     base_window_size = max(5, base_window_size)
     base_window_size = min(base_window_size, n_samples)
 
-    # A expansão cresce em blocos com o tamanho da janela inicial.
+    # Expansion grows in blocks using the initial window size.
     expansion_size = base_window_size
 
     windows = []
@@ -197,13 +197,13 @@ def build_expanding_windows(n_samples, window_ratio, train_ratio):
 
         val_size = current_window_size - train_size
         if val_size < 1:
-            raise ValueError("Janela inválida: parte de validação ficou vazia.")
+            raise ValueError("Invalid window: validation split is empty.")
 
         split = train_size
         windows.append((start, split, end))
         current_window_size += expansion_size
 
-    # Garante inclusão da janela final com todo o bloco de modelagem (80%).
+    # Ensure inclusion of the final window covering the full modeling block (80%).
     if not windows or windows[-1][2] != n_samples:
         current_window_size = n_samples
         train_size = int(np.floor(current_window_size * train_ratio))
@@ -237,7 +237,7 @@ BASE_XGB_PARAMS = {
     "seed": 42,
 }
 
-# --------------- CAMINHO DE PARAMETROS EM Results/xgboost/ew/params ---------------
+# --------------- PARAMETER PATH EM Results/xgboost/ew/params ---------------
 params_dir = os.path.join(parent_dir, 'Results', 'xgboost', 'ew', 'params')
 os.makedirs(params_dir, exist_ok=True)
 json_path = os.path.join(params_dir, f"{safe_gp_name}_xgb_params_ew.json")
@@ -251,13 +251,13 @@ best_n = None
 final_params = None
 
 if USE_SAVED_XGB_PARAMS and os.path.exists(json_path):
-    print(f"Usando parâmetros já salvos em: {json_path}")
+    print(f"Usando parameters already saved at: {json_path}")
     with open(json_path, 'r') as f:
         loaded_params = json.load(f)
 
     loaded_n = int(loaded_params.get("n_estimators", 0))
     if loaded_n < 1:
-        raise ValueError("Arquivo de parâmetros salvo inválido: 'n_estimators' ausente ou <= 0.")
+        raise ValueError("Invalid saved parameter file: 'n_estimators' ausente ou <= 0.")
 
     best_n = loaded_n
     best_params_train = {k: v for k, v in loaded_params.items() if k != "n_estimators"}
@@ -338,7 +338,7 @@ else:
 
     final_params = {**best_params_train, "n_estimators": best_n}
 
-print("\n--- TREINANDO MODELO FINAL (BASE DE MODELAGEM 80%) ---")
+print("\n--- TRAINING FINAL MODEL (80% MODELING SET) ---")
 dmodel_full = xgb.DMatrix(X_model, label=y_model)
 modelo_final = xgb.train(
     params=best_params_train,
@@ -347,16 +347,16 @@ modelo_final = xgb.train(
     verbose_eval=False
 )
 
-print("\nParâmetros Finais Otimizados:")
+print("\nFinal Optimized Parameters:")
 print(final_params)
 
-# --------------- SALVANDO EM Utils ---------------
+# --------------- SAVING TO Utils ---------------
 with open(json_path, 'w') as f:
     json.dump(final_params, f, indent=4)
-print(f"\n[SUCESSO] Parametros do Optuna salvos em:\n{json_path}")
+print(f"\n[SUCCESS] Optuna parameters saved at:\n{json_path}")
 # -----------------------------------------------
 
-print("\n--- AVALIAÇÃO INTERNA POR EXPANDING WINDOW (DENTRO DOS 80%) ---")
+print("\n--- INTERNAL EVALUATION POR EXPANDING WINDOW (DENTRO DOS 80%) ---")
 results_xgb = {"window": [], "rmse": [], "mae": [], "r2": []}
 
 for i, (start, split, end) in enumerate(expanding_windows, start=1):
@@ -391,7 +391,7 @@ for i, (start, split, end) in enumerate(expanding_windows, start=1):
     val_lap_end = int(np.floor(lap_model_sorted.iloc[end - 1]))
 
     print(
-        f"Janela {i} | treino LapNumber {train_lap_start}-{train_lap_end} (n={len(X_tr)}) | "
+        f"Window {i} | train LapNumber {train_lap_start}-{train_lap_end} (n={len(X_tr)}) | "
         f"val LapNumber {val_lap_start}-{val_lap_end} (n={len(X_va)}) | "
         f"RMSE={rmse_val:.4f} | R2={r2_val:.4f}"
     )
@@ -400,13 +400,13 @@ rmse_m_xgb, rmse_l_xgb, rmse_u_xgb = calc_stats(results_xgb["rmse"])
 mae_m_xgb, mae_l_xgb, mae_u_xgb = calc_stats(results_xgb["mae"])
 r2_m_xgb, r2_l_xgb, r2_u_xgb = calc_stats(results_xgb["r2"])
 
-print("\n--- RESULTADO FINAL XGBOOST ---")
-print(f"RMSE Médio: {rmse_m_xgb:.4f} IC95%: [{rmse_l_xgb:.4f}, {rmse_u_xgb:.4f}]")
-print(f"MAE Médio: {mae_m_xgb:.4f} IC95%: [{mae_l_xgb:.4f}, {mae_u_xgb:.4f}]")
-print(f"R2 Médio: {r2_m_xgb:.4f} IC95%: [{r2_l_xgb:.4f}, {r2_u_xgb:.4f}]")
+print("\n--- FINAL XGBOOST RESULT ---")
+print(f"RMSE Mean: {rmse_m_xgb:.4f} IC95%: [{rmse_l_xgb:.4f}, {rmse_u_xgb:.4f}]")
+print(f"MAE Mean: {mae_m_xgb:.4f} IC95%: [{mae_l_xgb:.4f}, {mae_u_xgb:.4f}]")
+print(f"R2 Mean: {r2_m_xgb:.4f} IC95%: [{r2_l_xgb:.4f}, {r2_u_xgb:.4f}]")
 
-print("\n--- TESTE FINAL NO HOLDOUT SEQUENCIAL (20%) ---")
-print(f"Teste final (holdout): voltas {holdout_start_lap}-{lap_max} | Registros: {len(X_holdout)}")
+print("\n--- FINAL TEST ON SEQUENTIAL HOLDOUT (20%) ---")
+print(f"Final test (holdout): laps {holdout_start_lap}-{lap_max} | Records: {len(X_holdout)}")
 dholdout_final = xgb.DMatrix(X_holdout, label=y_holdout)
 
 preds_holdout = modelo_final.predict(dholdout_final)
@@ -418,4 +418,8 @@ holdout_ci = calc_holdout_ci(y_holdout.to_numpy(), preds_holdout)
 print(f"Holdout RMSE: {rmse_holdout:.4f} IC95%: [{holdout_ci['rmse'][0]:.4f}, {holdout_ci['rmse'][1]:.4f}]")
 print(f"Holdout MAE: {mae_holdout:.4f} IC95%: [{holdout_ci['mae'][0]:.4f}, {holdout_ci['mae'][1]:.4f}]")
 print(f"Holdout R2: {r2_holdout:.4f} IC95%: [{holdout_ci['r2'][0]:.4f}, {holdout_ci['r2'][1]:.4f}]")
+
+
+
+
 

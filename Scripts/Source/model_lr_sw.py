@@ -1,4 +1,4 @@
-import pandas as pd
+﻿import pandas as pd
 import numpy as np
 import os
 import scipy.stats as stats
@@ -7,7 +7,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
-# Configurar o Grande Premio para carregar os dados
+# Configure the target Grand Prix to load data
 target_gp_name = os.environ.get('TARGET_GP_NAME', 'Bahrain Grand Prix')
 safe_gp_name = target_gp_name.lower().replace(' ', '_')
 
@@ -17,9 +17,9 @@ parent_dir = os.path.dirname(current_dir)
 model_data_dir = os.path.join(parent_dir, 'ModelData', target_gp_name)
 input_csv_path = os.path.join(model_data_dir, f"{safe_gp_name}_cleaned_data.csv")
 
-print(f"Carregando dados limpos de:\n{input_csv_path}")
+print(f"Loading cleaned data from:\n{input_csv_path}")
 if not os.path.exists(input_csv_path):
-    raise FileNotFoundError(f"Arquivo nao encontrado: {input_csv_path}. Execute o script_model_data.py primeiro.")
+    raise FileNotFoundError(f"File not found: {input_csv_path}. Run script_model_data.py first.")
 
 laps_cleaned = pd.read_csv(input_csv_path)
 
@@ -119,7 +119,7 @@ valid_indices = y_raw.dropna().index
 X_raw = X_raw.loc[valid_indices]
 y_raw = y_raw.loc[valid_indices]
 
-print("--- PREPARACAO PARA REGRESSAO LINEAR (DRIVER ONE-HOT) ---")
+print("--- PREPARATION FOR LINEAR REGRESSION (DRIVER ONE-HOT) ---")
 
 X_proc = X_raw.copy()
 X_proc[cat_cols] = X_proc[cat_cols].fillna('Missing')
@@ -128,24 +128,24 @@ X_proc = pd.get_dummies(X_proc, columns=cat_cols, drop_first=True)
 X = X_proc
 y = y_raw.copy()
 
-# Split sequencial por faixa de voltas: 80% para modelagem e 20% holdout final.
+# Sequential split by lap range: 80% for modeling and 20% final holdout.
 LAP_COL = 'LapNumber'
 HOLDOUT_RATIO = 0.20
 
 if LAP_COL not in df_base.columns:
-    raise KeyError(f"Coluna '{LAP_COL}' nao encontrada para split sequencial.")
+    raise KeyError(f"Column '{LAP_COL}' not found for sequential split.")
 
 lap_series = df_base.loc[valid_indices, LAP_COL]
 
 if lap_series.dropna().empty:
-    raise ValueError('Nao ha valores validos de LapNumber para aplicar split sequencial.')
+    raise ValueError('No valid LapNumber values available to apply sequential split.')
 
 lap_min = int(np.floor(lap_series.min()))
 lap_max = int(np.floor(lap_series.max()))
 total_laps_track = lap_max - lap_min + 1
 
 if total_laps_track < 2:
-    raise ValueError('Numero de voltas insuficiente para separar treino e holdout.')
+    raise ValueError('Insufficient number of laps to split train and holdout.')
 
 holdout_laps = max(1, int(np.ceil(total_laps_track * HOLDOUT_RATIO)))
 holdout_laps = min(holdout_laps, total_laps_track - 1)
@@ -159,25 +159,25 @@ model_idx = lap_series[model_mask].index
 holdout_idx = lap_series[holdout_mask].index
 
 if len(model_idx) == 0 or len(holdout_idx) == 0:
-    raise ValueError('Split sequencial invalido: treino/modelagem ou holdout ficou vazio.')
+    raise ValueError('Invalid sequential split: train/modeling or holdout is empty.')
 
 X_model = X.loc[model_idx]
 y_model = y.loc[model_idx]
 X_holdout = X.loc[holdout_idx]
 y_holdout = y.loc[holdout_idx]
 
-# Ordena a base de modelagem por volta para validacao temporal via sliding window.
+# Sort modeling data by lap for temporal validation using sliding windows.
 model_lap_series = lap_series.loc[model_idx]
 model_order_idx = model_lap_series.sort_values(kind='mergesort').index
 X_model = X_model.loc[model_order_idx].reset_index(drop=True)
 y_model = y_model.loc[model_order_idx].reset_index(drop=True)
 lap_model_sorted = model_lap_series.loc[model_order_idx].reset_index(drop=True)
 
-print('\n--- SPLIT SEQUENCIAL DEFINIDO ---')
-print(f'Pista: {target_gp_name}')
-print(f'Total de voltas consideradas: {total_laps_track} (LapNumber {lap_min}-{lap_max})')
-print(f'Holdout (20% final): voltas {holdout_start_lap}-{lap_max} | Total de voltas: {holdout_laps} | Registros: {len(X_holdout)}')
-print(f'Modelagem (80% iniciais): voltas {lap_min}-{model_end_lap} | Total de voltas: {total_laps_track - holdout_laps} | Registros: {len(X_model)}')
+print('\n--- SEQUENTIAL SPLIT DEFINED ---')
+print(f'Track: {target_gp_name}')
+print(f'Total laps considered: {total_laps_track} (LapNumber {lap_min}-{lap_max})')
+print(f'Holdout (final 20%): laps {holdout_start_lap}-{lap_max} | Total laps: {holdout_laps} | Records: {len(X_holdout)}')
+print(f'Modeling (initial 80%): laps {lap_min}-{model_end_lap} | Total laps: {total_laps_track - holdout_laps} | Records: {len(X_model)}')
 
 WINDOW_RATIO = 0.20
 WINDOW_TRAIN_RATIO = 0.80
@@ -185,7 +185,7 @@ WINDOW_STEP_RATIO = 0.20
 
 def build_sliding_windows(n_samples, window_ratio, train_ratio, step_ratio):
     if n_samples < 2:
-        raise ValueError('Dados insuficientes para sliding window (minimo 2 registros).')
+        raise ValueError('Insufficient data for sliding window (minimum 2 records).')
 
     window_size = int(np.ceil(n_samples * window_ratio))
     window_size = max(5, window_size)
@@ -198,7 +198,7 @@ def build_sliding_windows(n_samples, window_ratio, train_ratio, step_ratio):
 
     val_size = window_size - train_size
     if val_size < 1:
-        raise ValueError('Janela invalida: parte de validacao ficou vazia.')
+        raise ValueError('Invalid window: validation split is empty.')
 
     step_size = int(np.ceil(window_size * step_ratio))
     step_size = max(1, step_size)
@@ -232,7 +232,7 @@ print(
     f'train/val interno={train_size}/{val_size} | step_size={step_size} | janelas={len(sliding_windows)}'
 )
 
-print('\n--- AVALIACAO INTERNA POR SLIDING WINDOW (DENTRO DOS 80%) ---')
+print('\n--- INTERNAL EVALUATION POR SLIDING WINDOW (DENTRO DOS 80%) ---')
 results_lr = {'window': [], 'rmse': [], 'mae': [], 'r2': []}
 
 for i, (start, split, end) in enumerate(sliding_windows, start=1):
@@ -258,12 +258,12 @@ for i, (start, split, end) in enumerate(sliding_windows, start=1):
     val_lap_end = int(np.floor(lap_model_sorted.iloc[end - 1]))
 
     print(
-        f'Janela {i} | treino LapNumber {train_lap_start}-{train_lap_end} (n={len(X_tr)}) | '
+        f'Window {i} | train LapNumber {train_lap_start}-{train_lap_end} (n={len(X_tr)}) | '
         f'val LapNumber {val_lap_start}-{val_lap_end} (n={len(X_va)}) | '
         f'RMSE={rmse_val:.4f} | R2={r2_val:.4f}'
     )
 
-print('\n--- TREINANDO MODELO FINAL (BASE DE MODELAGEM 80%) ---')
+print('\n--- TRAINING FINAL MODEL (80% MODELING SET) ---')
 _, modelo_final, imputer_final, scaler_final = fit_predict_linear_regression(X_model, y_model, X_model)
 
 X_holdout_imp = imputer_final.transform(X_holdout)
@@ -279,16 +279,20 @@ rmse_m, rmse_l, rmse_u = calc_stats(results_lr['rmse'])
 mae_m, mae_l, mae_u = calc_stats(results_lr['mae'])
 r2_m, r2_l, r2_u = calc_stats(results_lr['r2'])
 
-print('\n--- RESULTADO FINAL REGRESSAO LINEAR ---')
+print('\n--- FINAL LINEAR REGRESSION RESULT ---')
 print(f'RMSE Medio: {rmse_m:.4f} IC95%: [{rmse_l:.4f}, {rmse_u:.4f}]')
 print(f'MAE Medio: {mae_m:.4f} IC95%: [{mae_l:.4f}, {mae_u:.4f}]')
 print(f'R2 Medio: {r2_m:.4f} IC95%: [{r2_l:.4f}, {r2_u:.4f}]')
 
-print('\n--- TESTE FINAL NO HOLDOUT SEQUENCIAL (20%) ---')
-print(f'Teste final (holdout): voltas {holdout_start_lap}-{lap_max} | Registros: {len(X_holdout)}')
+print('\n--- FINAL TEST ON SEQUENTIAL HOLDOUT (20%) ---')
+print(f'Final test (holdout): laps {holdout_start_lap}-{lap_max} | Records: {len(X_holdout)}')
 print(f'Holdout RMSE: {rmse_holdout:.4f}')
 print(f'Holdout MAE: {mae_holdout:.4f}')
 print(f'Holdout R2: {r2_holdout:.4f}')
 print(f"Holdout RMSE IC95%: [{holdout_ci['rmse'][0]:.4f}, {holdout_ci['rmse'][1]:.4f}]")
 print(f"Holdout MAE IC95%: [{holdout_ci['mae'][0]:.4f}, {holdout_ci['mae'][1]:.4f}]")
 print(f"Holdout R2 IC95%: [{holdout_ci['r2'][0]:.4f}, {holdout_ci['r2'][1]:.4f}]")
+
+
+
+

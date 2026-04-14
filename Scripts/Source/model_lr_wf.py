@@ -1,28 +1,28 @@
-import pandas as pd
+﻿import pandas as pd
 import numpy as np
 import os
 import scipy.stats as stats
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
-# Configurar o Grande Prêmio desejado para carregar os dados correspondentes
+# Configure the target Grand Prix to load corresponding data
 target_gp_name = os.environ.get('TARGET_GP_NAME', 'Bahrain Grand Prix')
 safe_gp_name = target_gp_name.lower().replace(' ', '_')
 
-# Definir os caminhos para ler o arquivo do ModelData
+# Define paths to read the ModelData file
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
 model_data_dir = os.path.join(parent_dir, 'ModelData', target_gp_name)
 input_csv_path = os.path.join(model_data_dir, f"{safe_gp_name}_cleaned_data.csv")
 
-print(f"Carregando dados limpos de:\n{input_csv_path}")
+print(f"Loading cleaned data from:\n{input_csv_path}")
 if not os.path.exists(input_csv_path):
-    raise FileNotFoundError(f"Arquivo não encontrado: {input_csv_path}. Execute o script_model_data.py primeiro.")
+    raise FileNotFoundError(f"File not found: {input_csv_path}. Run script_model_data.py first.")
 
-# Carregar o DataFrame
+# Load the DataFrame
 laps_cleaned = pd.read_csv(input_csv_path)
 
-# Preparação das colunas de base
+# Base feature preparation
 target_col = 'LapTime_seconds'
 df_base = laps_cleaned.copy() 
 
@@ -83,7 +83,7 @@ def save_folds_by_ratio_txt(df_folds, output_dir, section_title):
             f.write(df_ratio.to_string(index=False))
             f.write("\n")
 
-    print(f"Arquivos .txt salvos em: {output_dir}")
+    print(f"Text files saved at: {output_dir}")
 
 for ratio in window_ratios_to_test:
     window_laps = max(2, int(np.round(total_laps * ratio)))
@@ -127,8 +127,8 @@ for ratio in window_ratios_to_test:
             fold_details_lr.append({
                 "Ratio": f"{ratio:.0%}",
                 "Fold": len(metrics["rmse"]),
-                "Voltas_Treino": f"{train_start}-{train_end}",
-                "Voltas_Teste": f"{test_start}-{test_end}",
+                "Voltas_Train": f"{train_start}-{train_end}",
+                "Voltas_Test": f"{test_start}-{test_end}",
                 "Train_Regs": len(X_train_wf),
                 "Test_Regs": len(X_test_wf),
                 "RMSE": round(rmse_fold, 4),
@@ -157,7 +157,7 @@ for ratio in window_ratios_to_test:
         comparison_results_lr.append(res_row)
 
 df_comparison_lr = pd.DataFrame(comparison_results_lr)
-print("\n--- COMPARAÇÃO LINEAR REGRESSION WALK FORWARD (WF) ---")
+print("\n--- COMPARAÃ‡ÃƒO LINEAR REGRESSION WALK FORWARD (WF) ---")
 print(df_comparison_lr.to_string(index=False))
 
 if len(fold_details_lr) > 0:
@@ -168,15 +168,15 @@ if len(fold_details_lr) > 0:
     general_output_dir = os.path.join(results_root_dir, "wf_geral")
     save_folds_by_ratio_txt(df_folds_lr, general_output_dir, "Folds WF Geral")
 
-print("\n--- COMPARAÇÃO LINEAR REGRESSION WALK FORWARD (WF) | APENAS 2025 ---")
+print("\n--- COMPARAÃ‡ÃƒO LINEAR REGRESSION WALK FORWARD (WF) | APENAS 2025 ---")
 if "Year" not in df_base.columns:
-    print("Coluna 'Year' não encontrada. Não foi possível executar a seção de 2025.")
+    print("Column 'Year' not found. Could not run the 2025 section.")
 else:
     year_series = df_base.loc[valid_indices, "Year"].astype(str).str.strip()
     mask_2025 = year_series == "2025"
 
     if not mask_2025.any():
-        print("Não há registros de 2025 após limpeza para executar a avaliação dedicada.")
+        print("There are no records de 2025 after limpeza para executar a evaluation dedicada.")
     else:
         X_raw_2025 = X_raw.loc[mask_2025]
 
@@ -207,9 +207,9 @@ else:
                 mask_test = mask_2025 & (X_raw[LAP_COL] >= test_start) & (X_raw[LAP_COL] <= test_end)
 
                 if mask_test.any():
-                    # Treino temporalmente justo:
+                    # Train temporalmente justo:
                     # - Usa 2022/2023/2024 completos.
-                    # - Em 2025, usa apenas voltas anteriores ao início da janela de teste.
+                    # - Em 2025, usa apenas laps anteriores ao start da janela de test.
                     mask_train_temporal = (~mask_2025) | (mask_2025 & (X_raw[LAP_COL] < test_start))
 
                     test_idx = X_raw.index[mask_test]
@@ -243,7 +243,7 @@ else:
                     fold_details_lr_2025.append({
                         "Ratio": f"{ratio:.0%}",
                         "Fold": len(metrics["rmse"]),
-                        "Voltas_Teste_2025": f"{test_start}-{test_end}",
+                        "Voltas_Test_2025": f"{test_start}-{test_end}",
                         "Train_Regs_Total": len(X_train_wf),
                         "Train_Regs_2022_2024": train_prev_years_count,
                         "Train_Regs_2025_Passado": train_2025_count,
@@ -274,13 +274,13 @@ else:
                 comparison_results_lr_2025.append(res_row)
 
         if len(comparison_results_lr_2025) == 0:
-            print("Não foi possível gerar janelas válidas suficientes para 2025.")
+            print("Could not generate enough valid windows for 2025.")
         else:
             df_comparison_lr_2025 = pd.DataFrame(comparison_results_lr_2025)
             print(
-                f"Ano avaliado: 2025 | Voltas consideradas: {total_laps_2025} "
-                f"({lap_min_2025}-{lap_max_2025}) | Treino: todos os anos "
-                f"(exceto a janela de teste de 2025 em cada fold)"
+                f"Evaluated year: 2025 | Laps considered: {total_laps_2025} "
+                f"({lap_min_2025}-{lap_max_2025}) | Train: todos os anos "
+                f"(except the 2025 test window in each fold)"
             )
             print(df_comparison_lr_2025.to_string(index=False))
 
@@ -291,3 +291,7 @@ else:
 
                 y2025_output_dir = os.path.join(results_root_dir, "wf_2025")
                 save_folds_by_ratio_txt(df_folds_lr_2025, y2025_output_dir, "Folds WF 2025")
+
+
+
+
