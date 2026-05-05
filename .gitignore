@@ -1,13 +1,41 @@
-# Ignorar cache do FastF1
-Scripts/fastf1_cache/
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
 
-# Ignorar arquivos grandes e temporários
-*.sqlite
-*.ff1pkl
-
-# Ignorar arquivos do Jupyter Notebook checkpoints
+# Jupyter
 .ipynb_checkpoints/
 
-# Ignorar arquivos de sistema
+# FastF1 and local caches
+fastf1_cache/
+Scripts/fastf1_cache/
+Scripts/Notebooks/fastf1_cache/
+*.ff1pkl
+*.sqlite
+*.sqlite3
+
+# Generated model outputs
+Scripts/Results/
+Scripts/Notebooks/f1_plots/
+Scripts/Notebooks/*_xgb_params_sw.json
+Scripts/Notebooks/comparison_ci.png
+
+# Local editor and OS files
+.vscode/
 Thumbs.db
+Desktop.ini
 .DS_Store
+
+# Local documents and heavy reference bundles
+Bibliography/
+Bibliography.zip
+*.pdf
+
+# Local path snapshots
+reproducibility_paths.json
