@@ -1,34 +1,23 @@
-# TCC Formula 1 - Predictive Lap Time Analysis
+# Formula 1 Race-Pace Prediction
 
-## Title
-Multi-Circuit Analysis of Formula 1 Lap Times: comparison of temporal modeling approaches for forecasting and strategy support.
+This repository contains the current research code and notebooks for multi-circuit Formula 1 lap-time prediction. The project uses public FastF1-derived race data to model `LapTime_seconds` with a temporal protocol that mirrors a real race: sliding-window validation inside the modeling segment and a final sequential holdout on the last laps.
 
-## Objective
-This project develops and compares Machine Learning models to predict lap time in Formula 1 races using historical data from 2022 to 2025.
+## Scope
 
-Current repository focus:
-- comparison between Linear Regression and XGBoost
-- comparison between temporal validation strategies
-- evaluation on a final sequential holdout set
+The current version focuses on five Grand Prix events from the 2022-2025 technical-regulation period:
 
-## Main Implemented Updates
-1. Automated multi-track execution with a single script.
-2. Track parameterization through the `TARGET_GP_NAME` environment variable across main models.
-3. Standardized temporal split by `LapNumber`:
-   - initial 80% for modeling
-   - final 20% for sequential holdout
-4. Organized results by model family and approach.
-5. Removed coupling with legacy `batch_runs` in the current orchestrator.
-6. Added holdout 95% confidence intervals for `cv`, `ew`, and `sw` (bootstrap) for:
-   - RMSE
-   - MAE
-   - R2
+| Grand Prix | Circuit | Location |
+|---|---|---|
+| Bahrain Grand Prix | Bahrain International Circuit | Sakhir, Bahrain |
+| Saudi Arabian Grand Prix | Jeddah Corniche Circuit | Jeddah, Saudi Arabia |
+| United States Grand Prix | Circuit of the Americas | Austin, United States |
+| Italian Grand Prix | Autodromo Nazionale Monza | Monza, Italy |
+| Hungarian Grand Prix | Hungaroring | Mogyorod, Hungary |
 
-## Project Structure
+## Repository Layout
 
 ```text
 TCC/
-|- Bibliography/
 |- Data/
 |  |- Bahrain/
 |  |- Hungary/
@@ -36,145 +25,131 @@ TCC/
 |  |- Saudi Arabia/
 |  |- United States/
 |- Scripts/
+|  |- ModelData/
 |  |- Notebooks/
 |  |- Source/
-|  |  |- script_model_data.py
-|  |  |- run_all_models_tracks.py
-|  |  |- model_lr_cv.py
-|  |  |- model_lr_ew.py
-|  |  |- model_lr_sw.py
-|  |  |- model_lr_wf.py
-|  |  |- model_xgb_cv.py
-|  |  |- model_xgb_ew.py
-|  |  |- model_xgb_sw.py
-|  |  |- model_xgb_wf.py
-|  |- ModelData/
-|  |- Results/
-|  |- fastf1_cache/
+|     |- model_lr_sw.py
+|     |- model_xgb_sw.py
 |- Utils/
 |  |- compounds.json
 |  |- requirements.txt
-|- reproducibility_paths.json
 |- README.md
 ```
 
-Notes:
-- Legacy run folders may still exist inside some result subdirectories.
-- The active execution/output structure is the one described above.
+Generated outputs, FastF1 caches, local PDFs, notebook plot folders, XGBoost parameter dumps, and historical run logs are intentionally ignored by Git.
 
-## Execution Flow
+## Data
 
-### 1) Generate cleaned data by track
+`Data/` stores raw race-session CSV files by circuit:
 
-```bash
-python Scripts/Source/script_model_data.py
+- race laps
+- race weather
+- race results
+
+The modeling scripts run from cleaned datasets in `Scripts/ModelData/`. Those files contain the article-facing engineered data used by the notebooks and by the two scripts in `Scripts/Source/`.
+
+## Notebooks
+
+The notebooks in `Scripts/Notebooks/` are the full circuit-specific analyses:
+
+| Notebook | Circuit |
+|---|---|
+| `Notebook_Bahrain.ipynb` | Bahrain Grand Prix |
+| `Notebook_Saudi.ipynb` | Saudi Arabian Grand Prix |
+| `Notebook_USA.ipynb` | United States Grand Prix |
+| `Notebook_Italia.ipynb` | Italian Grand Prix |
+| `Notebook_Hungary.ipynb` | Hungarian Grand Prix |
+
+Each notebook is written in English and follows the same structure: data preparation, exploratory analysis, feature engineering, Linear Regression, XGBoost, sliding-window validation, sequential holdout, and COS metrics.
+
+## Modeling Scripts
+
+Only the current sliding-window scripts are kept in `Scripts/Source/`:
+
+- `model_lr_sw.py`: Linear Regression with median imputation, standard scaling, sliding-window validation, and sequential holdout.
+- `model_xgb_sw.py`: XGBoost with Optuna hyperparameter tuning, sliding-window validation, and sequential holdout.
+
+Both scripts report:
+
+- sliding-window RMSE, MAE, R2, and residual standard deviation
+- sequential-holdout RMSE, MAE, and R2 with bootstrap confidence intervals
+- `COS_MAE` and `COS_RMSE` with indicative 95% confidence intervals
+
+The COS metrics are computed as:
+
+```text
+COS_MAE  = 0.5 * (MAE_SW / MAE_final)  + 0.5 * (STD_SW / STD_final)
+COS_RMSE = 0.5 * (RMSE_SW / RMSE_final) + 0.5 * (STD_SW / STD_final)
 ```
 
-Expected input:
-- `Data/<Track>/...`
+The COS confidence intervals are descriptive because the sliding windows overlap.
 
-Expected output:
-- `Scripts/ModelData/<Grand Prix>/<safe_gp_name>_cleaned_data.csv`
-
-### 2) Run models individually
-
-Examples:
-
-```bash
-python Scripts/Source/model_lr_cv.py
-python Scripts/Source/model_lr_ew.py
-python Scripts/Source/model_lr_sw.py
-python Scripts/Source/model_xgb_cv.py
-python Scripts/Source/model_xgb_ew.py
-python Scripts/Source/model_xgb_sw.py
-```
-
-### 3) Run multi-track and multi-model batch
-
-```bash
-python Scripts/Source/run_all_models_tracks.py
-```
-
-The orchestrator allows selecting tracks and models and generates logs per run.
-
-## Track Parameterization
-Main scripts use:
-- `TARGET_GP_NAME` (environment variable)
-
-If the variable is not set, each script uses its internal default value.
-
-PowerShell example:
-
-```powershell
-$env:TARGET_GP_NAME = "United States Grand Prix"
-python Scripts/Source/model_xgb_sw.py
-```
-
-## Validation Approaches
-
-### CV
-- internal K-Fold validation on the modeling set (80%)
-
-### EW
-- Expanding Window on the modeling set (80%)
-
-### SW
-- Sliding Window on the modeling set (80%)
-
-### WF
-- Walk-Forward (WF-specific scripts)
-
-## Metrics and Holdout CI
-For `cv`, `ew`, and `sw`, final evaluation includes:
-- Holdout RMSE
-- Holdout MAE
-- Holdout R2
-- Holdout 95% confidence interval for RMSE, MAE, and R2 via bootstrap
-
-Internal evaluation remains reported by approach (CV, EW, SW).
-
-## Artifact Locations
-
-### XGBoost Parameters
-- `Scripts/Results/xgboost/cv/params/*_xgb_params_cv.json`
-- `Scripts/Results/xgboost/ew/params/*_xgb_params_ew.json`
-- `Scripts/Results/xgboost/sw/params/*_xgb_params_sw.json`
-
-### Execution Logs
-Current structure by family/approach:
-- `Scripts/Results/<family>/<approach>/runs/<timestamp>/logs/*.log`
-
-### Orchestrator Summaries
-- `Scripts/Results/runs/<timestamp>/summary.json`
-- `Scripts/Results/runs/<timestamp>/summary.csv`
-
-## Dependencies
-Dependencies are listed in:
-- `Utils/requirements.txt`
-
-Installation:
+## Installation
 
 ```bash
 pip install -r Utils/requirements.txt
 ```
 
-## Reproducibility
-The repository includes a machine-readable directory map for reproducibility:
-- `reproducibility_paths.json`
+## Running a Model
 
-This file centralizes input/output directories and canonical script paths used to run the pipeline.
+PowerShell:
 
-## Current Status
-- Functional pipeline for 5 GPs: Bahrain, Hungary, Italy, Saudi Arabia, United States.
-- Active comparison between model families and temporal approaches.
-- Reorganized and standardized result structure.
-- Holdout 95% confidence intervals implemented for `cv`, `ew`, and `sw`.
+```powershell
+$env:TARGET_GP_NAME = "Bahrain Grand Prix"
+python Scripts/Source/model_lr_sw.py
+python Scripts/Source/model_xgb_sw.py
+```
+
+Bash:
+
+```bash
+TARGET_GP_NAME="Bahrain Grand Prix" python Scripts/Source/model_lr_sw.py
+TARGET_GP_NAME="Bahrain Grand Prix" python Scripts/Source/model_xgb_sw.py
+```
+
+Supported `TARGET_GP_NAME` values are:
+
+- `Bahrain Grand Prix`
+- `Saudi Arabian Grand Prix`
+- `United States Grand Prix`
+- `Italian Grand Prix`
+- `Hungarian Grand Prix`
+
+## Key Features
+
+Numerical predictors:
+
+- `TyreLife`
+- `LapNumber`
+- `Humidity_RBF_Median`
+- `Pressure_RBF_Median`
+- `TrackTemp_RBF_Median`
+- `WindSpeed_RBF_Median`
+- `TempDelta_RBF_Median`
+- `LapTime_prev`
+
+Categorical predictors:
+
+- `Driver`
+- `Team`
+- `pirelliCompound`
+- `Year`
+
+Target:
+
+- `LapTime_seconds`
+
+## Reproducibility Notes
+
+- The final 20% of race laps is reserved as a sequential holdout.
+- Sliding-window validation is performed only inside the first 80% modeling block.
+- XGBoost parameter files are generated under `Scripts/Results/` when needed and are ignored by Git.
+- The notebooks remain the narrative, circuit-specific record of the analysis; the scripts are the lean reproducible runners for GitHub.
 
 ## Authors
+
 - Marcos Paulo de Oliveira Pereira
+- Carlos Henrique Gomes Ferreira
 - Alexandre Magno de Sousa
 
-UFOP - Computer Engineering
-
-## License
-Academic use.
+Universidade Federal de Ouro Preto (UFOP)
